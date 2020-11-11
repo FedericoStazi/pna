@@ -64,6 +64,7 @@ class EIGNet(nn.Module):
             
 
     def forward(self, g, h, e, snorm_n, snorm_e):
+        print(h)
         #h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
         if self.pos_enc_dim > 0:
