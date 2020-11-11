@@ -170,6 +170,9 @@ class SBMsDataset(torch.utils.data.Dataset):
             self.train = f[0]
             self.val = f[1]
             self.test = f[2]
+            g,l = self.train[0]
+            print(g.ndata['feat'])
+            print(l)
         self._add_positional_encoding(5, norm, pos_enc_dim)
 
         if verbose:
