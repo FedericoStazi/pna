@@ -73,6 +73,8 @@ class EIGLayerComplex(nn.Module):
 
     def forward(self, g, h, e, snorm_n):
 
+        print("h1 " + str(h.shape))
+        
         h_in = h
         g.ndata['h'] = h
 
@@ -87,6 +89,8 @@ class EIGLayerComplex(nn.Module):
         g.update_all(self.message_func, self.reduce_func)
         h = torch.cat([h, g.ndata['h']], dim=1)
 
+        print("h2 " + str(h.shape))
+        
         # posttransformation
         h = self.posttrans(h)
 
@@ -159,6 +163,8 @@ class EIGLayerSimple(nn.Module):
         return self.posttrans(nodes.data['h'])
 
     def forward(self, g, h, e, snorm_n):
+        
+        print("h1 " + str(h.shape))
 
         h_in = h
         g.ndata['h'] = h
@@ -169,6 +175,8 @@ class EIGLayerSimple(nn.Module):
         g.update_all(self.message_func, self.reduce_func)
         h = g.ndata['h']
 
+        print("h2 " + str(h.shape))
+        
         # posttransformation
         h = self.posttrans(h)
 
@@ -251,6 +259,8 @@ class EIGTower(nn.Module):
         return self.posttrans(nodes.data['h'])
 
     def forward(self, g, h, e, snorm_n):
+        
+        print("h1 " + str(h.shape))
 
         g.ndata['h'] = h
 
@@ -264,6 +274,8 @@ class EIGTower(nn.Module):
         g.update_all(self.message_func, self.reduce_func)
         h = torch.cat([h, g.ndata['h']], dim=1)
 
+        print("h2 " + str(h.shape))
+        
         # posttransformation
         h = self.posttrans(h)
 
