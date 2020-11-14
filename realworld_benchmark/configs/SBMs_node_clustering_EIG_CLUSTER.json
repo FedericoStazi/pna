@@ -26,7 +26,7 @@
         "layer_type": "dgl",
         "L": 4,
         "hidden_dim": 80,
-        "out_dim": 85
+        "out_dim": 85,
         "residual": true,
         "JK": "last",
         "edge_feat": false,
