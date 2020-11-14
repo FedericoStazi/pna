@@ -41,7 +41,7 @@ class EIGNet(nn.Module):
         self.gru_enable = net_params['gru']
         device = net_params['device']
         
-        #self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
+        self.embedding_h = nn.Embedding(in_dim_node, hidden_dim) # node feat is an integer
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
 
         self.layers = nn.ModuleList([EIGLayer(in_dim=hidden_dim, out_dim=hidden_dim, dropout=dropout, graph_norm=self.graph_norm,
@@ -65,7 +65,7 @@ class EIGNet(nn.Module):
 
     def forward(self, g, h, e, snorm_n, snorm_e):
         print(h)
-        #h = self.embedding_h(h)
+        h = self.embedding_h(h)
         h = self.in_feat_dropout(h)
         if self.pos_enc_dim > 0:
             h_pos_enc = self.embedding_pos_enc(g.ndata['pos_enc'].to(self.device))
