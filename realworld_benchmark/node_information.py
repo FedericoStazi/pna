@@ -2,6 +2,7 @@ import networkx
 import random
 import numpy
 import scipy
+import dgl
 
 def get_nodes_degree(graph):
     return list(graph.in_degrees())
