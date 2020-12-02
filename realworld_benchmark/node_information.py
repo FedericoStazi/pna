@@ -26,9 +26,9 @@ def get_nodes_eigenvector(graph, k=1):
     N = scipy.sparse.diags(dgl.backend.asnumpy(graph.in_degrees()).clip(1), dtype=float)
     L = N * scipy.sparse.eye(graph.number_of_nodes()) - A
 
-    EigVal, EigVec = scipy.sparse.linalg.eigs(L, k, which='SR', tol=5e-1)
+    EigVal, EigVec = scipy.sparse.linalg.eigs(L, k+1, which='SR', tol=5e-1)
     EigVec = EigVec[:, EigVal.argsort()]
-    return numpy.real(EigVec[:, -1])
+    return numpy.real(EigVec[:][-1])
 
 NODE_INFORMATION = {'degree' : get_nodes_degree, 'closeness_centrality' : get_nodes_closeness_centrality,
                     'betweenness_centrality' : get_nodes_betweenness_centrality, 'pagerank' : get_nodes_pagerank,
