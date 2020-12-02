@@ -7,13 +7,13 @@ def get_nodes_degree(graph):
     return list(graph.in_degrees())
 
 def get_nodes_closeness_centrality(graph):
-    return list(networkx.closeness_centrality(graph.to_networkx()).values())
+    return list(networkx.closeness_centrality(graph.to_networkx().to_undirected()).values())
 
 def get_nodes_betweenness_centrality(graph):
-    return list(networkx.betweenness_centrality(graph.to_networkx()).values())
+    return list(networkx.betweenness_centrality(graph.to_networkx().to_undirected()).values())
 
 def get_nodes_pagerank(graph):
-    return list(networkx.algorithms.link_analysis.pagerank_alg.pagerank(graph.to_networkx()).values())
+    return list(networkx.algorithms.link_analysis.pagerank_alg.pagerank(graph.to_networkx().to_undirected()).values())
 
 def get_nodes_triangles(graph):
     return list(networkx.algorithms.cluster.triangles(graph.to_networkx().to_undirected()).values())
@@ -22,7 +22,7 @@ def get_nodes_random(graph):
     return list([random.random() for _ in graph.nodes()])
 
 def get_nodes_eigenvector(graph, k=1):
-    A = networkx.linalg.graphmatrix.laplacian_matrix(graph.to_networkx()).asfptype()
+    A = networkx.linalg.graphmatrix.adjacency_matrix(graph.to_networkx().to_undirected()).asfptype()
     e, v = scipy.sparse.linalg.eigs(A, k)
     return numpy.real([x[-1] for x in v])
 
