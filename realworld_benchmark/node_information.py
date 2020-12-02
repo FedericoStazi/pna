@@ -22,9 +22,13 @@ def get_nodes_random(graph):
     return list([random.random() for _ in graph.nodes()])
 
 def get_nodes_eigenvector(graph, k=1):
-    A = networkx.linalg.graphmatrix.laplacian_matrix(graph.to_networkx().to_undirected()).asfptype()
-    e, v = scipy.sparse.linalg.eigs(A, k)
-    return numpy.real([x[-1] for x in v])
+    A = graph.adjacency_matrix_scipy(return_edge_ids=False).astype(float)
+    N = scipy.sparse.diags(dgl.backend.asnumpy(graph.in_degrees()).clip(1), dtype=float)
+    L = N * scipy.sparse.eye(graph.number_of_nodes()) - A
+
+    EigVal, EigVec = scipy.sparse.linalg.eigs(L, k, which='SR', tol=5e-1)
+    EigVec = EigVec[:, EigVal.argsort()]
+    print(numpy.real(EigVec[:, -1]))
 
 NODE_INFORMATION = {'degree' : get_nodes_degree, 'closeness_centrality' : get_nodes_closeness_centrality,
                     'betweenness_centrality' : get_nodes_betweenness_centrality, 'pagerank' : get_nodes_pagerank,
