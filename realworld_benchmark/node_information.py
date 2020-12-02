@@ -22,7 +22,7 @@ def get_nodes_random(graph):
     return list([random.random() for _ in graph.nodes()])
 
 def get_nodes_eigenvector(graph, k=1):
-    A = networkx.linalg.graphmatrix.adjacency_matrix(graph.to_networkx()).asfptype()
+    A = networkx.linalg.graphmatrix.laplacian_matrix(graph.to_networkx()).asfptype()
     e, v = scipy.sparse.linalg.eigs(A, k)
     return numpy.real([x[-1] for x in v])
 
