@@ -4,23 +4,26 @@ import numpy
 import scipy
 import dgl
 
+def normalize(l):
+    return (l - numpy.mean(l)) / numpy.std(l)
+
 def get_nodes_degree(graph):
-    return list(graph.in_degrees())
+    return normalize(list(graph.in_degrees()))
 
 def get_nodes_closeness_centrality(graph):
-    return list(networkx.closeness_centrality(graph.to_networkx().to_undirected()).values())
+    return normalize(list(networkx.closeness_centrality(graph.to_networkx().to_undirected()).values()))
 
 def get_nodes_betweenness_centrality(graph):
-    return list(networkx.betweenness_centrality(graph.to_networkx().to_undirected()).values())
+    return normalize(list(networkx.betweenness_centrality(graph.to_networkx().to_undirected()).values()))
 
 def get_nodes_pagerank(graph):
-    return list(networkx.algorithms.link_analysis.pagerank_alg.pagerank(graph.to_networkx().to_undirected()).values())
+    return normalize(list(networkx.algorithms.link_analysis.pagerank_alg.pagerank(graph.to_networkx().to_undirected()).values()))
 
 def get_nodes_triangles(graph):
-    return list(networkx.algorithms.cluster.triangles(graph.to_networkx().to_undirected()).values())
+    return normalize(list(networkx.algorithms.cluster.triangles(graph.to_networkx().to_undirected()).values()))
 
 def get_nodes_random(graph):
-    return list([random.random() for _ in graph.nodes()])
+    return normalize(list([random.random() for _ in graph.nodes()]))
 
 def get_nodes_eigenvector(graph, k=1):
     A = graph.adjacency_matrix_scipy(return_edge_ids=False).astype(float)
@@ -29,7 +32,7 @@ def get_nodes_eigenvector(graph, k=1):
 
     EigVal, EigVec = scipy.sparse.linalg.eigs(L, k+1, which='SR', tol=5e-1)
     EigVec = EigVec[:, EigVal.argsort()]
-    return numpy.absolute(numpy.real(EigVec[:, -1]))
+    return normalize(numpy.absolute(numpy.real(EigVec[:, -1])))
 
 NODE_INFORMATION = {'degree' : get_nodes_degree, 'closeness_centrality' : get_nodes_closeness_centrality,
                     'betweenness_centrality' : get_nodes_betweenness_centrality, 'pagerank' : get_nodes_pagerank,
