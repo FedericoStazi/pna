@@ -102,5 +102,6 @@ class EIGNet(nn.Module):
         distances = scores.unsqueeze(0).repeat(1, len(scores), 1)[0] - scores.repeat(len(scores), 1)
         distances = torch.sum(distances.pow(2), dim=1)
         print(distances.size())
+        print(targets.size())
         loss = nn.MSELoss()(distances, targets)
         return loss
