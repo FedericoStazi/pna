@@ -83,7 +83,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             self.graph_lists.append(g)
 
         for l in labels:
-            self.graph_labels.append(torch.cuda.FloatTensor(l))
+            self.graph_labels.append(torch.cuda.LongTensor(l))
 
         #print(self.graph_labels[0])
 
@@ -122,7 +122,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
-        labels = torch.tensor(np.array(labels)).unsqueeze(1)
+        #labels = torch.tensor(np.array(labels)).unsqueeze(1)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
