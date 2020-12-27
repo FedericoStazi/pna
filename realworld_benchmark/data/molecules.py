@@ -18,7 +18,8 @@ MAX_DIST = 2
 def graph_distance(a, b):
     dist = nx_sim.graph_edit_distance(a.to_networkx().to_undirected(),
                                       b.to_networkx().to_undirected(),
-                                      upper_bound = MAX_DIST)
+                                      upper_bound = MAX_DIST,
+                                      timeout = 1e-6)
     return MAX_DIST if dist is None else dist
 
 EPS = 1e-5
