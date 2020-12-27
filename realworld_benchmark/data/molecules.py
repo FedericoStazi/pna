@@ -16,6 +16,7 @@ def graph_distance(a, b):
     return abs(a.number_of_nodes() - b.number_of_nodes())
 
 EPS = 1e-5
+MAX_GRAPHS = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -40,6 +41,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.split = molecule_dgl.split
         self.num_graphs = molecule_dgl.num_graphs
         self.n_samples = molecule_dgl.n_samples
+        if MAX_GRAPHS:
+            self.num_graphs = self.n_samples = MAX_GRAPHS
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
