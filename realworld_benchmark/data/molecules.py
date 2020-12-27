@@ -85,6 +85,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         for l in labels:
             self.graph_labels.append(torch.cuda.FloatTensor(l))
 
+        print(self.graph_labels[0])
+
         #print()
 
     def __len__(self):
