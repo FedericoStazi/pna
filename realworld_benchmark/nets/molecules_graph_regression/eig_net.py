@@ -98,9 +98,9 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        print(scores.size())
-        print(targets.size())
-        print(scores)
-        print(targets)
-        loss = nn.MSELoss()(scores, targets)
+        distances = []
+        for s1 in scores:
+            for s2 in scores:
+                distances.append(abs(s1 - s2))
+        loss = nn.MSELoss()(distances, targets)
         return loss
