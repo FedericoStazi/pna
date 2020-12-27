@@ -100,6 +100,6 @@ class EIGNet(nn.Module):
     def loss(self, scores, targets):
         print(scores.size())
         print(scores.unsqueeze(0).size())
-        distances = torch.abs(scores.unsqueeze(0).repeat(len(scores), 1) - scores.repeat(len(scores)))
+        distances = torch.abs(scores.unsqueeze(0).repeat(1, len(scores), 1)[0] - scores.repeat(len(scores), 1))
         loss = nn.MSELoss()(distances, targets)
         return loss
