@@ -86,6 +86,8 @@ class EIGNet(nn.Module):
         return self.MLP_layer(g.ndata['h'])
 
     def loss(self, scores, targets):
+        print(scores.size())
+        print(targets.size())
         print(scores)
         print(targets)
         loss = nn.MSELoss()(scores, targets)
