@@ -4,6 +4,9 @@ import numpy
 import scipy
 import dgl
 
+def normalize(l):
+    return (l - numpy.mean(l)) / (numpy.std(l) if numpy.std(l) > 1e-6 else 1)
+
 def get_nodes_degree(graph):
     return list(graph.in_degrees())
 
@@ -36,4 +39,7 @@ NODE_INFORMATION = {'degree' : get_nodes_degree, 'closeness_centrality' : get_no
                     'triangles' : get_nodes_triangles, 'random' : get_nodes_random,
                     'eig1' : (lambda g : get_nodes_eigenvector(g, 1)),
                     'eig2' : (lambda g : get_nodes_eigenvector(g, 2)),
-                    'eig3' : (lambda g : get_nodes_eigenvector(g, 3))}
+                    'eig3' : (lambda g : get_nodes_eigenvector(g, 3)),
+                    'degree_normalized' : (lambda g : normalize(get_nodes_degree(g))),
+                    'triangles_normalized' : (lambda g : normalize(get_nodes_triangles(g)))
+                   }
