@@ -14,5 +14,6 @@ import numpy as np
 def MAE(scores, targets):
     distances = scores.unsqueeze(0).repeat(1, len(scores), 1)[0] - scores.repeat(len(scores), 1)
     distances = torch.sum(distances.pow(2), dim=1)
+    print(distances, targets)
     MAE = F.l1_loss(distances, targets)
     return MAE
