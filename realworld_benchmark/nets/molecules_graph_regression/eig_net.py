@@ -102,5 +102,5 @@ class EIGNet(nn.Module):
         for s1 in scores:
             for s2 in scores:
                 distances.append(abs(s1 - s2))
-        loss = nn.MSELoss()(torch.cuda.FloatTensor(distances), targets)
+        loss = nn.MSELoss()(torch.cuda.FloatTensor(distances, requires_grad=True), targets)
         return loss
