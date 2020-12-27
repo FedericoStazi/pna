@@ -99,9 +99,9 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        print(scores.repeat(1, len(scores)).flatten().unsqueeze(1))
-        print(scores.repeat(len(scores), 1))
-        distances = scores.repeat(1, len(scores)).flatten().unsqueeze(1) - scores.repeat(len(scores), 1)
-        distances = torch.sum(distances.pow(2), dim=1)
+        n = len(scores)
+        a = scores.repeat(n, 1)
+        b = scores.unsqueeze(1).repeat(1,n,1).flatten(end_dim=1)
+        distances = torch.sum((a-b)**2, dim=1)
         loss = nn.MSELoss()(distances, targets)
         return loss
