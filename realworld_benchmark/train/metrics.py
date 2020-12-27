@@ -16,6 +16,5 @@ def MAE(scores, targets):
     a = scores.repeat(n, 1)
     b = scores.unsqueeze(1).repeat(1, n, 1).flatten(end_dim=1)
     distances = torch.sum((a - b) ** 2, dim=1)
-    print(distances, targets)
     MAE = F.l1_loss(distances, targets)
     return MAE
