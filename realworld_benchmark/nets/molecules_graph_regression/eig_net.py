@@ -11,6 +11,7 @@ from nets.mlp_readout_layer import MLPReadout
 class EIGNet(nn.Module):
     def __init__(self, net_params):
         super().__init__()
+        embedding_size = 10
         num_feat = net_params['num_feat']
         hidden_dim = net_params['hidden_dim']
         out_dim = net_params['out_dim']
@@ -50,7 +51,7 @@ class EIGNet(nn.Module):
                                     pretrans_layers=pretrans_layers, posttrans_layers=posttrans_layers).model)
 
 
-        self.MLP_layer = MLPReadout(out_dim, 1)  # 1 out dim since regression problem
+        self.MLP_layer = MLPReadout(out_dim, embedding_size)
 
 
     def forward(self, g, h, e, snorm_n, snorm_e):
@@ -98,7 +99,7 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        distances = torch.abs(torch.squeeze(scores.unsqueeze(0).repeat(1, len(scores), 1)[0] - scores.repeat(len(scores), 1)))
-        print(distances.size(), targets.size())
+        distances = scores.unsqueeze(0).repeat(1, len(scores), 1)[0] - scores.repeat(len(scores), 1)
+        print(distances.size())
         loss = nn.MSELoss()(distances, targets)
         return loss
