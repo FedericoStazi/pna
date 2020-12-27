@@ -50,12 +50,7 @@ class EIGNet(nn.Module):
                                     pretrans_layers=pretrans_layers, posttrans_layers=posttrans_layers).model)
 
 
-        if self.gru_enable:
-            self.gru = GRU(hidden_dim, hidden_dim, device)
-        if self.readout == "directional" or self.readout == "directional_abs":
-            self.MLP_layer = MLPReadout(2 * out_dim, 1)
-        else:
-            self.MLP_layer = MLPReadout(out_dim, 1)  # 1 out dim since regression problem
+        self.MLP_layer = MLPReadout(out_dim, 1)  # 1 out dim since regression problem
 
 
     def forward(self, g, h, e, snorm_n, snorm_e):
