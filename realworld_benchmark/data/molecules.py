@@ -47,8 +47,10 @@ class StructureAwareGraph(torch.utils.data.Dataset):
     def _prepare(self, features, label):
         #print("preparing %d graphs for the %s set..." % (self.num_graphs, self.split.upper()))
 
+        labels = []
+
         for molecule in self.data:
-            #print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
+            print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
 
             #atom_features = molecule['atom_type'].long()
 
@@ -70,15 +72,18 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             g.ndata['feat'] = torch.cuda.FloatTensor(
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
-            l = torch.cuda.FloatTensor([])
-            for g1, l1 in zip(self.graph_lists, self.graph_labels):
+            l = []
+            for g1, l1 in zip(self.graph_lists, lables):
                 d = graph_distance(g, g1)
                 l.append(d)
                 l1.append(d)
 
             l.append(graph_distance(g, g))
-            self.graph_labels.append()
+            labels.append(l)
             self.graph_lists.append(g)
+
+        for l in labels:
+            self.graph_labels.append(torch.cuda.FloatTensor(l))
 
         #print()
 
