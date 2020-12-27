@@ -73,7 +73,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
             l = []
-            for g1, l1 in zip(self.graph_lists, lables):
+            for g1, l1 in zip(self.graph_lists, labels):
                 d = graph_distance(g, g1)
                 l.append(d)
                 l1.append(d)
