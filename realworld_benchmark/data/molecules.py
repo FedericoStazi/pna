@@ -42,6 +42,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.num_graphs = molecule_dgl.num_graphs
         self.n_samples = molecule_dgl.n_samples
         if MAX_GRAPHS:
+            self.data = molecule_dgl.data[:MAX_GRAPHS]
             self.num_graphs = self.n_samples = MAX_GRAPHS
         self.graph_lists = []
         self.graph_labels = []
