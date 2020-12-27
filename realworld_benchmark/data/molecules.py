@@ -19,7 +19,7 @@ def graph_distance(a, b):
     return 4 if dist is None else dist
 
 EPS = 1e-5
-MAX_GRAPHS = 200
+MAX_GRAPHS = 0
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
