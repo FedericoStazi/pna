@@ -13,7 +13,7 @@ from scipy import sparse as sp
 import numpy as np
 import networkx.algorithms.similarity as nx_sim
 
-MAX_DIST = 4
+MAX_DIST = 2
 
 def graph_distance(a, b):
     dist = nx_sim.graph_edit_distance(a.to_networkx().to_undirected(),
