@@ -11,12 +11,15 @@ import csv
 import dgl
 from scipy import sparse as sp
 import numpy as np
+import networkx.algorithms.similarity as nx_sim
+
+MAX_DIST = 4
 
 def graph_distance(a, b):
-    dist = graph_edit_distance(a.to_networkx().to_undirected(),
-                               b.to_networkx().to_undirected(),
-                               upper_bound = 4)
-    return 4 if dist is None else dist
+    dist = nx_sim.graph_edit_distance(a.to_networkx().to_undirected(),
+                                      b.to_networkx().to_undirected(),
+                                      upper_bound = MAX_DIST)
+    return MAX_DIST if dist is None else dist
 
 EPS = 1e-5
 MAX_GRAPHS = 0
