@@ -98,13 +98,6 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        distances = []
-        for s1 in scores:
-            for s2 in scores:
-                distances.append(abs(s1 - s2))
-        print(torch.cuda.FloatTensor(distances).size())
-        print(torch.cuda.FloatTensor(distances))
-        print(targets.size())
-        print(targets)
-        loss = nn.MSELoss()(torch.cuda.FloatTensor(distances), targets)
+        distances = torch.abs(scores.unsqueeze(0).repeat(len(scores)) - scores.repeat(len(scores)))
+        loss = nn.MSELoss()(distances, targets)
         return loss
