@@ -36,8 +36,7 @@ class EIGNet(nn.Module):
 
         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
 
-        k = 10
-        self.embedding_h = nn.Embedding(k, hidden_dim)
+        self.embedding_h = nn.Linear(num_feat, hidden_dim)
 
         self.layers = nn.ModuleList([EIGLayer(in_dim=hidden_dim, out_dim=hidden_dim, dropout=dropout, graph_norm=self.graph_norm,
                       batch_norm=self.batch_norm, residual=self.residual, aggregators=self.aggregators,
