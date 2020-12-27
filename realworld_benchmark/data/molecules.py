@@ -14,12 +14,15 @@ import numpy as np
 import networkx.algorithms.similarity as nx_sim
 
 MAX_DIST = 4
-
+'''
 def graph_distance(a, b):
     dist = nx_sim.optimize_graph_edit_distance(a.to_networkx().to_undirected(),
                                               b.to_networkx().to_undirected(),
                                               upper_bound = MAX_DIST)
     return next(dist, MAX_DIST)
+'''
+def graph_distance(a, b):
+    return abs(a.number_of_nodes() - b.number_of_nodes())
 
 EPS = 1e-5
 MAX_GRAPHS = 200
