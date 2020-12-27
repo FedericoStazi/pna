@@ -12,6 +12,9 @@ import dgl
 from scipy import sparse as sp
 import numpy as np
 
+def graph_distance(a, b):
+    return abs(a.number_of_nodes() - b.number_of_nodes())
+
 EPS = 1e-5
 
 # Can be removed?
@@ -38,7 +41,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.num_graphs = molecule_dgl.num_graphs
         self.n_samples = molecule_dgl.n_samples
         self.graph_lists = []
-        self.node_labels = []
+        self.graph_labels = []
         self._prepare(features, label)
 
     def _prepare(self, features, label):
@@ -67,11 +70,15 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             g.ndata['feat'] = torch.cuda.FloatTensor(
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
+            l = torch.cuda.FloatTensor([])
+            for g1, l1 in zip(self.graph_lists, self.graph_labels):
+                d = graph_distance(g, g1)
+                l.append(d)
+                l1.append(d)
+
+            l.append(graph_distance(g, g))
+            self.graph_labels.append()
             self.graph_lists.append(g)
-
-            # Set node labels
-            self.node_labels.append(torch.cuda.FloatTensor([np.array([x]) for x in label(g)]))
-
 
         print()
 
