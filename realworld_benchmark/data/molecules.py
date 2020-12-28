@@ -15,7 +15,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-MAX_GRAPHS = 0
+MAX_GRAPHS = 128
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -77,7 +77,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
             l = []
             for g1, l1 in zip(self.graph_lists, labels):
-                d = graph_distance(g, g1)
+                d = graph_distance(g, g1)**2
                 l.append(d)
                 l1.append(d)
 
