@@ -115,6 +115,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         l = []
         miss = 0
         graphs_shift = [graphs[-1]] + graphs[:-1]
+        print(self.distances)
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:
                 miss += 1
