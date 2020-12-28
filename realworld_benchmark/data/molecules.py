@@ -16,7 +16,7 @@ from graph_edit_distance import graph_distance
 
 EPS = 1e-5
 MAX_GRAPHS = 128
-NUM_PAIRS = 2048
+NUM_PAIRS = 128
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -84,7 +84,10 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
         self.graph_pairs_lists = np.random.choice(self.graph_lists, size=(NUM_PAIRS, 2), replace=True)
 
+        print()
+
         for g1,g2 in self.graph_pairs_lists:
+            print("\rdistance %d out of %d" % (len(self.graph_pairs_labels), len( self.graph_pairs_lists)), end="")
             self.graph_pairs_labels.append(graph_distance(g1, g2)**2)
 
         #print(self.graph_labels[0])
