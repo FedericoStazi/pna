@@ -21,16 +21,14 @@ def embedding_distances(embeddings, distance_function):
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
     if distance_function == "L1":
-        f = torch.nn.L1Loss()
+        return torch.mean(torch.abs(a-b), dim=1)
     elif distance_function == "L2":
-        f = torch.MSELoss()
-    elif distance_function == "L2^2":
-        f = torch.MSELoss()
+        return torch.mean((a-b)**2, dim=1)
     elif distance_function == "cos":
-        f = torch.nn.CosineSimilarity()
+        return torch.nn.CosineSimilarity()
     else:
-        f = None
-    return torch.sum((a-b)**2, dim=1)
+        return None
+
 
 class GraphEditDistance(object):
     """
