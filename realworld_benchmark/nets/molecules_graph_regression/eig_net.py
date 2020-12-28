@@ -4,6 +4,7 @@ import dgl
 from nets.gru import GRU
 from nets.eig_layer import EIGLayer
 from nets.mlp_readout_layer import MLPReadout
+from graph_edit_distance import embedding_distances
 
 
 
@@ -99,9 +100,5 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        n = len(scores)
-        a = scores.repeat(n, 1)
-        b = scores.unsqueeze(1).repeat(1,n,1).flatten(end_dim=1)
-        distances = torch.sum((a-b)**2, dim=1)
-        loss = nn.MSELoss()(distances, targets)
+        loss = nn.MSELoss()(embedding_distances(scores), targets)
         return loss

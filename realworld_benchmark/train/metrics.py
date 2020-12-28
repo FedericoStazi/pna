@@ -9,12 +9,9 @@ import torch.nn.functional as F
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 import numpy as np
+from graph_edit_distance import embedding_distances
 
 
 def MAE(scores, targets):
-    n = len(scores)
-    a = scores.repeat(n, 1)
-    b = scores.unsqueeze(1).repeat(1, n, 1).flatten(end_dim=1)
-    distances = torch.sum((a - b) ** 2, dim=1)
-    MAE = F.l1_loss(distances, targets)
+    MAE = F.l1_loss(embedding_distances(scores), targets)
     return MAE
