@@ -283,7 +283,7 @@ def main():
         DATASET_NAME = args.dataset
     else:
         DATASET_NAME = config['dataset']
-    print('ok')
+
     print(DATASET_NAME)
     dataset = MoleculeDataset(DATASET_NAME, [NODE_INFORMATION[feature] for feature in args.features.split()],
                               NODE_INFORMATION[args.label], args.max_graphs, norm=args.lap_norm)
@@ -392,6 +392,10 @@ def main():
         net_params['type_net'] = args.type_net
     if args.lap_norm is not None:
         net_params['lap_norm'] = args.lap_norm
+    if args.embedding_size is not None:
+        net_params['embedding_size'] = args.embedding_size
+    if args.distance_function is not None:
+        net_params['distance_function'] = args.distance_function
 
     g0, _ = dataset.train[0]
     net_params['num_feat'] = len(g0.ndata['feat'][0])
