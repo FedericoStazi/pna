@@ -263,6 +263,7 @@ def main():
     # structure aware gnn
     parser.add_argument('--features', type=str, help='Space separated list of node features.')
     parser.add_argument('--label', type=str, help='Single node label')
+    parser.add_argument('--max_graphs', type=int, help='Maximum number of graphs considered')
 
     args = parser.parse_args()
     print(args.config)
@@ -283,7 +284,7 @@ def main():
     print('ok')
     print(DATASET_NAME)
     dataset = MoleculeDataset(DATASET_NAME, [NODE_INFORMATION[feature] for feature in args.features.split()],
-                              NODE_INFORMATION[args.label], norm=args.lap_norm)
+                              NODE_INFORMATION[args.label], args.max_graphs, norm=args.lap_norm)
     if args.out_dir is not None:
         out_dir = args.out_dir
     else:

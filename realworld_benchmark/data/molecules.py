@@ -15,7 +15,6 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-MAX_GRAPHS = 128
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -34,15 +33,16 @@ class MoleculeDGL(torch.utils.data.Dataset):
 
 class StructureAwareGraph(torch.utils.data.Dataset):
     # Create a StructureAwareGraph from a MoleculeDGL
-    def __init__(self, molecule_dgl, features, label):
+    def __init__(self, molecule_dgl, features, label, max_graphs):
         self.data = molecule_dgl.data
         self.data_dir = molecule_dgl.data_dir
         self.split = molecule_dgl.split
         self.num_graphs = molecule_dgl.num_graphs
         self.n_samples = molecule_dgl.n_samples
-        if MAX_GRAPHS:
-            self.data = molecule_dgl.data[:MAX_GRAPHS]
-            self.num_graphs = self.n_samples = MAX_GRAPHS
+        max_graphs = max(min(max_graphs, molecule_dgl.n_samples), 0)
+        if max_graphs:
+            self.data = molecule_dgl.data[:max_graphs]
+            self.num_graphs = self.n_samples = max_graphs
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
@@ -86,7 +86,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
 class MoleculeDataset(torch.utils.data.Dataset):
 
-    def __init__(self, name, features, label, norm='none', verbose=True):
+    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True):
         """
             Loading SBM datasets
         """
@@ -97,9 +97,9 @@ class MoleculeDataset(torch.utils.data.Dataset):
         data_dir = 'data/'
         with open(data_dir + name + '.pkl', "rb") as f:
             f = pickle.load(f)
-            self.train = StructureAwareGraph(f[0], features, label)
-            self.val = StructureAwareGraph(f[1], features, label)
-            self.test = StructureAwareGraph(f[2], features, label)
+            self.train = StructureAwareGraph(f[0], features, label, max_graphs)
+            self.val = StructureAwareGraph(f[1], features, label, max_graphs)
+            self.test = StructureAwareGraph(f[2], features, label, max_graphs)
             self.num_atom_type = f[3]
             self.num_bond_type = f[4]
         if verbose:
