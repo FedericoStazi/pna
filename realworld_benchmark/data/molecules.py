@@ -16,7 +16,6 @@ from graph_edit_distance import graph_distance
 
 EPS = 1e-5
 MAX_GRAPHS = 128
-NUM_PAIRS = 128
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -46,8 +45,6 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             self.num_graphs = self.n_samples = MAX_GRAPHS
         self.graph_lists = []
         self.graph_labels = []
-        self.graph_pairs_lists = []
-        self.graph_pairs_labels = []
         self._prepare(features, label)
 
     def _prepare(self, features, label):
@@ -79,29 +76,13 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             self.graph_lists.append(g)
             self.graph_labels.append(torch.cuda.LongTensor([]))
 
-        for _ in self.graph_lists:
-            self.graph_labels.append(torch.cuda.FloatTensor([]))
-
-        self.graph_pairs_lists = np.random.choice(self.graph_lists, size=(NUM_PAIRS, 2), replace=True)
-
-        print()
-
-        for g1,g2 in self.graph_pairs_lists:
-            print("\rdistance %d out of %d" % (len(self.graph_pairs_labels), len( self.graph_pairs_lists)), end="")
-            self.graph_pairs_labels.append(graph_distance(g1, g2)**2)
-
-        #print(self.graph_labels[0])
-
         print()
 
     def __len__(self):
         return self.n_samples
 
-    #def __getitem__(self, idx):
-        #return self.graph_lists[idx], self.graph_labels[idx]
-
     def __getitem__(self, idx):
-        return self.graph_pairs_lists[idx], self.graph_pairs_labels[idx]
+        return self.graph_lists[idx], self.graph_labels[idx]
 
 class MoleculeDataset(torch.utils.data.Dataset):
 
@@ -125,12 +106,22 @@ class MoleculeDataset(torch.utils.data.Dataset):
             print('train, test, val sizes :', len(self.train), len(self.test), len(self.val))
             print("[I] Finished loading.")
             print("[I] Data load time: {:.4f}s".format(time.time() - start))
+        self.distances = {}
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
-        labels = torch.cuda.FloatTensor(labels)
+        l = []
+        graphs_shift = [graphs[-1]] + graphs[:-1]
+        for g1,g2 in zip(graphs, graphs_shift):
+            if (g1,g2) not in self.distances:
+                if  (g2,g1) in self.distances:
+                    self.distances[(g1,g2)] = self.distances[(g2,g1)]
+                else:
+                    self.distances[(g1,g2)] = graph_distance(g1, g2)**2
+            l.append(self.distances[(g1,g2)])
+        labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
