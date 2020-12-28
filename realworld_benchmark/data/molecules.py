@@ -74,7 +74,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
             self.graph_lists.append(g)
-            self.graph_labels.append(torch.cuda.LongTensor([]))
+            self.graph_labels.append(len(self.graph_lists))
 
         print()
 
@@ -118,6 +118,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
             if (g1,g2) not in self.distances:
                 self.distances[(g1,g2)] = graph_distance(g1, g2)**2
             l.append(self.distances[(g1,g2)])
+        print(labels)
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
