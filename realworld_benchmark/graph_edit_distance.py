@@ -1,3 +1,5 @@
+import torch
+
 MAX_DIST = 4
 '''
 def graph_distance(a, b):
