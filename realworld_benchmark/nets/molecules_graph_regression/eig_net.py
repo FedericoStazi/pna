@@ -12,7 +12,7 @@ from graph_edit_distance import embedding_distances
 class EIGNet(nn.Module):
     def __init__(self, net_params):
         super().__init__()
-        embedding_size = 10
+        embedding_size = 100
         num_feat = net_params['num_feat']
         hidden_dim = net_params['hidden_dim']
         out_dim = net_params['out_dim']
@@ -100,5 +100,6 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
+        # maybe mean percentage error?
         loss = nn.MSELoss()(embedding_distances(scores), targets)
         return loss
