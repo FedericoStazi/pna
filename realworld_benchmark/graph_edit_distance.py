@@ -17,8 +17,10 @@ def graph_distance(a, b):
 
 def embedding_distances(embeddings):
     n = len(embeddings)
-    a = embeddings.repeat(n, 1)
-    b = embeddings.unsqueeze(1).repeat(1, n, 1).flatten(end_dim=1)
+    #a = embeddings.repeat(n, 1)
+    #b = embeddings.unsqueeze(1).repeat(1, n, 1).flatten(end_dim=1)
+    a = embeddings.squeeze()
+    b = torch.roll(a, 1)
     return torch.sum((a - b) ** 2, dim=1)
 
 class GraphEditDistance(object):
