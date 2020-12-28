@@ -113,15 +113,17 @@ class MoleculeDataset(torch.utils.data.Dataset):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
         l = []
+        miss = 0
         graphs_shift = [graphs[-1]] + graphs[:-1]
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:
-                print("x")
+                miss += 1
                 if  (g2,g1) in self.distances:
                     self.distances[(g1,g2)] = self.distances[(g2,g1)]
                 else:
                     self.distances[(g1,g2)] = graph_distance(g1, g2)**2
             l.append(self.distances[(g1,g2)])
+        print("miss: " + str(miss) + "/" + str(len(l)))
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
