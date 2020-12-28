@@ -75,6 +75,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             g.ndata['feat'] = torch.cuda.FloatTensor(
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
+            '''
             l = []
             for g1, l1 in zip(self.graph_lists, labels):
                 d = graph_distance(g, g1)**2
@@ -83,10 +84,17 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
             l.append(graph_distance(g, g))
             labels.append(l)
+            '''
+
             self.graph_lists.append(g)
 
+        '''
         for l in labels:
             self.graph_labels.append(torch.cuda.LongTensor(l))
+        '''
+
+        for _ in self.graph_lists:
+            self.graph_labels.append(torch.cuda.FloatTensor([]))
 
         #print(self.graph_labels[0])
 
@@ -123,12 +131,13 @@ class MoleculeDataset(torch.utils.data.Dataset):
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
+        print("collate")
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
         l = []
         for g1 in graphs:
             for g2 in graphs:
-                l.append(graph_distance(g1, g2))
+                l.append(graph_distance(g1, g2)**2)
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
