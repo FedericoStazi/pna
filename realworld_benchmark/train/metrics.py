@@ -13,7 +13,5 @@ from graph_edit_distance import embedding_distances
 
 
 def MAE(scores, targets):
-    print(embedding_distances(scores))
-    print(targets)
     MAE = F.l1_loss(embedding_distances(scores), targets)
     return MAE
