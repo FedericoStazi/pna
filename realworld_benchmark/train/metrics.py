@@ -12,7 +12,7 @@ import numpy as np
 from graph_edit_distance import embedding_distances
 
 
-def MAE(scores, targets):
+def MAE(scores, targets, distance_function):
     MAE = F.l1_loss(torch.sqrt(embedding_distances(scores)),
                     torch.sqrt(targets))
     return MAE

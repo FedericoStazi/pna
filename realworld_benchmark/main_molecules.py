@@ -264,6 +264,8 @@ def main():
     parser.add_argument('--features', type=str, help='Space separated list of node features.')
     parser.add_argument('--label', type=str, help='Single node label')
     parser.add_argument('--max_graphs', type=int, help='Maximum number of graphs considered')
+    parser.add_argument('--embedding_size', type=int, help='Size of the graph embedding')
+    parser.add_argument('--distance_function', type=str, help='Embeddings distance function')
 
     args = parser.parse_args()
     print(args.config)

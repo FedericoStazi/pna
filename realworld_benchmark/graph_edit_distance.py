@@ -15,13 +15,20 @@ def graph_distance(a, b):
     d,_ = VanillaAED().ged(a.to_networkx().to_undirected(), b.to_networkx().to_undirected())
     return d
 
-def embedding_distances(embeddings):
+def embedding_distances(embeddings, distance_function):
     n = len(embeddings)
-    #a = embeddings.repeat(n, 1)
-    #b = embeddings.unsqueeze(1).repeat(1, n, 1).flatten(end_dim=1)
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
-    return torch.sum((a - b) ** 2, dim=1)
+    if distance_function == "L1":
+        return torch.nn.L1Loss()(a, b)
+    elif distance_function == "L2":
+        return torch.sqrt(torch.MSELoss()(a, b))
+    elif distance_function == "L2^2":
+        return torch.MSELoss()(a, b)
+    elif distance_function == "cos":
+        return torch.nn.CosineSimilarity()(a,b)
+    else:
+        return None
 
 class GraphEditDistance(object):
     """

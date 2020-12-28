@@ -12,7 +12,8 @@ from graph_edit_distance import embedding_distances
 class EIGNet(nn.Module):
     def __init__(self, net_params):
         super().__init__()
-        embedding_size = 100
+        embedding_size = net_params['embedding_size']
+        self.distance_function = net_params['distance_function']
         num_feat = net_params['num_feat']
         hidden_dim = net_params['hidden_dim']
         out_dim = net_params['out_dim']
@@ -84,22 +85,14 @@ class EIGNet(nn.Module):
             hg = dgl.sum_nodes(g, 'h')
         elif self.readout == "max":
             hg = dgl.max_nodes(g, 'h')
-        elif self.readout == "mean":
+        elif self.readout == "max":
             hg = dgl.mean_nodes(g, 'h')
-        elif self.readout == "directional_abs":
-            g.ndata['dir'] = h * torch.abs(g.ndata['eig'][:, 1:2].to(self.device)) / torch.sum(
-                torch.abs(g.ndata['eig'][:, 1:2].to(self.device)), dim=1, keepdim=True)
-            hg = torch.cat([dgl.mean_nodes(g, 'dir'), dgl.mean_nodes(g, 'h')], dim=1)
-        elif self.readout == "directional":
-            g.ndata['dir'] = h * g.ndata['eig'][:, 1:2].to(self.device) / torch.sum(
-                torch.abs(g.ndata['eig'][:, 1:2].to(self.device)), dim=1, keepdim=True)
-            hg = torch.cat([torch.abs(dgl.mean_nodes(g, 'dir')), dgl.mean_nodes(g, 'h')], dim=1)
         else:
-            hg = dgl.mean_nodes(g, 'h')  # default readout is mean nodes
+            hg = None
 
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
         # maybe mean percentage error?
-        loss = nn.MSELoss()(embedding_distances(scores), targets)
+        loss = nn.MSELoss()(embedding_distances(scores, self.distance_function), targets)
         return loss
