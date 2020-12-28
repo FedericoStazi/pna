@@ -15,7 +15,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-MAX_GRAPHS = 0
+MAX_GRAPHS = 200
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
