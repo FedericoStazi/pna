@@ -128,6 +128,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
             print('train, test, val sizes :', len(self.train), len(self.test), len(self.val))
             print("[I] Finished loading.")
             print("[I] Data load time: {:.4f}s".format(time.time() - start))
+        self.distances = {}
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
@@ -137,7 +138,12 @@ class MoleculeDataset(torch.utils.data.Dataset):
         l = []
         for g1 in graphs:
             for g2 in graphs:
-                l.append(graph_distance(g1, g2)**2)
+                if (g1,g2) not in self.distances:
+                    if  (g2,g1) in self.distances:
+                        self.distances[(g1,g2)] = self.distances[(g2,g1)]
+                    else:
+                        self.distances[(g1,g2)] = graph_distance(g1, g2)**2
+                l.append(self.distances[(g1,g2)])
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
