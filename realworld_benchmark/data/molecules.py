@@ -77,7 +77,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
             self.graph_lists.append(g)
-            self.graph_labels.append(torch.cuda.LongTensor(l))
+            self.graph_labels.append(torch.cuda.LongTensor([]))
 
         for _ in self.graph_lists:
             self.graph_labels.append(torch.cuda.FloatTensor([]))
