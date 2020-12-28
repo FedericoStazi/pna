@@ -30,7 +30,7 @@ def embedding_distances(embeddings, distance_function):
         f = torch.nn.CosineSimilarity()
     else:
         f = None
-    return [f(p,q) for p,q in zip(a,b)]
+    return torch.sum((a-b)**2, dim=1)
 
 class GraphEditDistance(object):
     """
