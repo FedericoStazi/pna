@@ -5,6 +5,7 @@ import os
 import glob
 import itertools
 import torch
+import torch.nn.functional as F
 
 from itertools import chain
 from scipy.spatial.distance import cdist
@@ -20,7 +21,7 @@ def embedding_distances(embeddings, distance_function):
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
     print(a-b)
-    print(torch.nn.L1Loss()(a, b))
+    print(F.l1_loss(a, b))
     if distance_function == "L1":
         return torch.nn.L1Loss()(a, b)
     elif distance_function == "L2":
