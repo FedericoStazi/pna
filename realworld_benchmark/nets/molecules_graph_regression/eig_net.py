@@ -85,7 +85,7 @@ class EIGNet(nn.Module):
             hg = dgl.sum_nodes(g, 'h')
         elif self.readout == "max":
             hg = dgl.max_nodes(g, 'h')
-        elif self.readout == "max":
+        elif self.readout == "mean":
             hg = dgl.mean_nodes(g, 'h')
         else:
             hg = None
