@@ -20,18 +20,17 @@ def embedding_distances(embeddings, distance_function):
     n = len(embeddings)
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
-    print(a-b)
-    print(F.l1_loss(a, b))
     if distance_function == "L1":
-        return torch.nn.L1Loss()(a, b)
+        f = torch.nn.L1Loss()
     elif distance_function == "L2":
-        return torch.sqrt(torch.MSELoss()(a, b))
+        f = torch.MSELoss()
     elif distance_function == "L2^2":
-        return torch.MSELoss()(a, b)
+        f = torch.MSELoss()
     elif distance_function == "cos":
-        return torch.nn.CosineSimilarity()(a,b)
+        f = torch.nn.CosineSimilarity()
     else:
-        return None
+        f = None
+    return [f(p,q) for p,q in zip(a,b)]
 
 class GraphEditDistance(object):
     """
