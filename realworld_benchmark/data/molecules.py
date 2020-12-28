@@ -115,14 +115,10 @@ class MoleculeDataset(torch.utils.data.Dataset):
         l = []
         miss = 0
         graphs_shift = [graphs[-1]] + graphs[:-1]
-        print(self.distances)
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:
                 miss += 1
-                if  (g2,g1) in self.distances:
-                    self.distances[(g1,g2)] = self.distances[(g2,g1)]
-                else:
-                    self.distances[(g1,g2)] = graph_distance(g1, g2)**2
+                self.distances[(g1,g2)] = graph_distance(g1, g2)**2
             l.append(self.distances[(g1,g2)])
         print("miss: " + str(miss) + "/" + str(len(l)))
         labels = torch.cuda.FloatTensor(l)
