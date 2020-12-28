@@ -93,6 +93,5 @@ class EIGNet(nn.Module):
         return self.MLP_layer(hg)
 
     def loss(self, scores, targets):
-        # maybe mean percentage error?
         loss = nn.MSELoss()(embedding_distances(scores, self.distance_function), targets)
         return loss

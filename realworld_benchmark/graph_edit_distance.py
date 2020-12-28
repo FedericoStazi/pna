@@ -19,6 +19,8 @@ def embedding_distances(embeddings, distance_function):
     n = len(embeddings)
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
+    print(a-b)
+    print(torch.nn.L1Loss()(a, b))
     if distance_function == "L1":
         return torch.nn.L1Loss()(a, b)
     elif distance_function == "L2":
