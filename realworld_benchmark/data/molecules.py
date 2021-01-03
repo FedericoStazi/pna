@@ -2,6 +2,7 @@
 # Copyright (c) 2020 Vijay Prakash Dwivedi, Chaitanya K. Joshi, Thomas Laurent, Yoshua Bengio, Xavier Bresson
 
 
+import random
 import torch
 import pickle
 import torch.utils.data
@@ -46,7 +47,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             self.num_graphs = self.n_samples = max_graphs
         print(self.split)
         if (self.split == "train"):
-            self.num_graphs = self.n_samples = K * self.num_graph
+            self.num_graphs = self.n_samples = K * self.num_graphs
             for _ in range(K-1):
                 self.data = self.data.append(molecule_dgl.data)
             random.shuffle(self.data)
