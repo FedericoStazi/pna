@@ -45,11 +45,10 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             max_graphs = max(min(max_graphs, molecule_dgl.n_samples), 0)
             self.data = molecule_dgl.data[:max_graphs]
             self.num_graphs = self.n_samples = max_graphs
-        print(self.split)
         if (self.split == "train"):
             self.num_graphs = self.n_samples = K * self.num_graphs
             for _ in range(K-1):
-                self.data.append(molecule_dgl.data)
+                self.data.extend(molecule_dgl.data)
             random.shuffle(self.data)
         self.graph_lists = []
         self.graph_labels = []
