@@ -31,7 +31,7 @@ def train_epoch(model, optimizer, device, data_loader, epoch):
         optimizer.step()
         epoch_loss += loss.detach().item()
         mae = MAE(batch_scores, batch_targets, model.distance_function)
-        print("\ntrain ", batch_scores, batch_targets, mae)
+        #print("\ntrain ", batch_scores, batch_targets, mae)
         epoch_train_mae += mae
         nb_data += batch_targets.size(0)
     epoch_loss /= (iter + 1)
@@ -56,7 +56,7 @@ def evaluate_network(model, device, data_loader, epoch):
             loss = model.loss(batch_scores, batch_targets)
             epoch_test_loss += loss.detach().item()
             mae = MAE(batch_scores, batch_targets, model.distance_function)
-            print("\neval ", batch_scores, batch_targets, mae)
+            #print("\neval ", batch_scores, batch_targets, mae)
             epoch_test_mae += mae
             nb_data += batch_targets.size(0)
         epoch_test_loss /= (iter + 1)
