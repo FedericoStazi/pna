@@ -16,7 +16,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-K = 2
+K = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -114,12 +114,17 @@ class MoleculeDataset(torch.utils.data.Dataset):
             print("[I] Finished loading.")
             print("[I] Data load time: {:.4f}s".format(time.time() - start))
         self.distances = {}
+        self.total_graphs = (K * self.train.num_graphs
+                             + self.val.num_graphs
+                             + self.test.num_graphs)
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
         l = []
+        if len(self.distances) < self.total_graphs:
+            print(len(self.distances), " / ", self.total_graphs)
         graphs_shift = [graphs[-1]] + graphs[:-1]
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:

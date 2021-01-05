@@ -21,11 +21,11 @@ def embedding_distances(embeddings, distance_function):
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
     if distance_function == "L1":
-        return torch.sum(torch.abs(a-b), dim=1)
+        return torch.mean(torch.abs(a-b), dim=1)
     elif distance_function == "L2":
-        return torch.sum((a-b)**2, dim=1)
+        return torch.mean((a-b)**2, dim=1)
     elif distance_function == "cos":
-        return torch.nn.CosineSimilarity() #TODO
+        return torch.nn.CosineSimilarity()
     else:
         return None
 
