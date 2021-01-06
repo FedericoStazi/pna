@@ -16,7 +16,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-K = 1
+K = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -49,7 +49,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             self.num_graphs = self.n_samples = K * self.num_graphs
             for _ in range(K-1):
                 self.data.extend(molecule_dgl.data)
-            random.shuffle(self.data)
+            random.Random(0).shuffle(self.data)
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
@@ -124,7 +124,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         graphs, labels = map(list, zip(*samples))
         l = []
         if len(self.distances) < self.total_graphs:
-            print(len(self.distances), " / ", self.total_graphs, end = " ")
+            print("\r", len(self.distances), " / ", self.total_graphs, end = " ")
         graphs_shift = [graphs[-1]] + graphs[:-1]
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:
