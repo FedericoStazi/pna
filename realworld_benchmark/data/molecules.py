@@ -50,6 +50,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
             for _ in range(K-1):
                 random.Random(0).shuffle(molecule_dgl.data)
                 self.data.extend(molecule_dgl.data)
+        print(self.split, self.num_graphs, max_graphs)
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
@@ -117,6 +118,8 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.total_graphs = (K * self.train.num_graphs
                              + self.val.num_graphs
                              + self.test.num_graphs)
+        # Get precomputed labels from file
+
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
