@@ -48,8 +48,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         if (self.split == "train"):
             self.num_graphs = self.n_samples = K * self.num_graphs
             for _ in range(K-1):
+                random.Random(0).shuffle(molecule_dgl.data)
                 self.data.extend(molecule_dgl.data)
-            random.Random(0).shuffle(self.data)
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
