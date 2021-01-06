@@ -124,7 +124,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         graphs, labels = map(list, zip(*samples))
         l = []
         if len(self.distances) < self.total_graphs:
-            print(len(self.distances), " / ", self.total_graphs)
+            print(len(self.distances), " / ", self.total_graphs, end = " ")
         graphs_shift = [graphs[-1]] + graphs[:-1]
         for g1,g2 in zip(graphs, graphs_shift):
             if (g1,g2) not in self.distances:
