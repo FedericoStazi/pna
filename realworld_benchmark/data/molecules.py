@@ -36,22 +36,17 @@ class MoleculeDGL(torch.utils.data.Dataset):
 class StructureAwareGraph(torch.utils.data.Dataset):
     # Create a StructureAwareGraph from a MoleculeDGL
     def __init__(self, molecule_dgl, features, label, max_graphs):
-        self.data = molecule_dgl.data
         self.data_dir = molecule_dgl.data_dir
-        self.split = molecule_dgl.split       
-        self.num_graphs = molecule_dgl.num_graphs
-        self.n_samples = molecule_dgl.n_samples
-        if max_graphs:
-            max_graphs = max(min(max_graphs, molecule_dgl.n_samples), 0)
-            self.data = molecule_dgl.data[:max_graphs]
-            self.num_graphs = self.n_samples = max_graphs
+        self.split = molecule_dgl.split
+        max_graphs = max(min(max_graphs, molecule_dgl.num_graphs), 0)
+        self.data = molecule_dgl.data[:max_graphs]
+        self.num_graphs = self.n_samples = max_graphs
         if (self.split == "train"):
             self.num_graphs = self.n_samples = K * self.num_graphs
             for i in range(K-1):
                 data = molecule_dgl.data[:max_graphs]
                 random.Random(i).shuffle(data)
                 self.data.extend(data)
-        print(self.split, self.num_graphs, max_graphs)
         self.graph_lists = []
         self.graph_labels = []
         self._prepare(features, label)
@@ -117,7 +112,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
             print("[I] Data load time: {:.4f}s".format(time.time() - start))
 
         self.distances = {}
-        self.total_graphs = (K * self.train.num_graphs
+        self.total_graphs = (self.train.num_graphs
                              + self.val.num_graphs
                              + self.test.num_graphs)
 
