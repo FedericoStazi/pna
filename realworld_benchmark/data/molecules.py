@@ -52,7 +52,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self._prepare(features, label)
 
     def _prepare(self, features, label):
-        #print("preparing %d graphs for the %s set..." % (self.num_graphs, self.split.upper()))
+        #print("preparing %d graphs for the %sx
+        # set..." % (self.num_graphs, self.split.upper()))
 
         for molecule in self.data:
             print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
@@ -116,19 +117,19 @@ class MoleculeDataset(torch.utils.data.Dataset):
                              + self.val.num_graphs
                              + self.test.num_graphs)
 
-        '''
+        #'''
         # Get precomputed labels from file
         self.precomputed_labels = []
-        self.precomputed_labels.extend(open("train.txt").read().split(",")[:self.train.num_graphs])
-        self.precomputed_labels.extend(open("test.txt").read().split(","))
-        self.precomputed_labels.extend(open("val.txt").read().split(","))
-        '''
+        self.precomputed_labels.extend(open("precomputed_distances/train128.txt").read().split(",")[:self.train.num_graphs])
+        self.precomputed_labels.extend(open("precomputed_distances/test128.txt").read().split(","))
+        self.precomputed_labels.extend(open("precomputed_distances/val128.txt").read().split(","))
+        #'''
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
-        #'''
+        '''
         l = []
         if len(self.distances) < self.total_graphs:
             print("\r", len(self.distances), " / ", self.total_graphs, end = " ")
@@ -137,9 +138,11 @@ class MoleculeDataset(torch.utils.data.Dataset):
             if (g1,g2) not in self.distances:
                 self.distances[(g1,g2)] = graph_distance(g1, g2)**2
             l.append(self.distances[(g1,g2)])
+        '''
         #'''
-        #l = self.precomputed_labels[:len(samples)]
-        #self.precomputed_labels = self.precomputed_labels[len(samples):]
+        l = self.precomputed_labels[:len(samples)]
+        self.precomputed_labels = self.precomputed_labels[len(samples):]
+        #'''
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
