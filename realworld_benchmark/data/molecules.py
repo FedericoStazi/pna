@@ -140,7 +140,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         l = self.precomputed_labels[:len(samples)]
         self.precomputed_labels = self.precomputed_labels[len(samples):]
         '''
-        #labels = torch.cuda.FloatTensor(l)
+        labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
