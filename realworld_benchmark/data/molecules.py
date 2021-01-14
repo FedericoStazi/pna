@@ -120,9 +120,9 @@ class MoleculeDataset(torch.utils.data.Dataset):
         #'''
         # Get precomputed labels from file
         self.precomputed_labels = []
-        self.precomputed_labels.extend(open("precomputed_distances/train128.txt").read().split(",")[:self.train.num_graphs])
-        self.precomputed_labels.extend(open("precomputed_distances/test128.txt").read().split(","))
-        self.precomputed_labels.extend(open("precomputed_distances/val128.txt").read().split(","))
+        self.precomputed_labels.extend(open("data/precomputed_distances/train128.txt").read().split(",")[:self.train.num_graphs])
+        self.precomputed_labels.extend(open("data/precomputed_distances/test128.txt").read().split(","))
+        self.precomputed_labels.extend(open("data/precomputed_distances/val128.txt").read().split(","))
         #'''
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
@@ -142,6 +142,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         #'''
         l = self.precomputed_labels[:len(samples)]
         self.precomputed_labels = self.precomputed_labels[len(samples):]
+
         #'''
         labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
