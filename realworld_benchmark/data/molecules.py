@@ -35,7 +35,7 @@ class MoleculeDGL(torch.utils.data.Dataset):
 
 class StructureAwareGraph(torch.utils.data.Dataset):
     # Create a StructureAwareGraph from a MoleculeDGL
-    def __init__(self, molecule_dgl, features, label, max_graphs):
+    def __init__(self, molecule_dgl, features, label, max_graphs, precomputed_labels):
         self.data_dir = molecule_dgl.data_dir
         self.split = molecule_dgl.split
         max_graphs = max(min(max_graphs, molecule_dgl.num_graphs), 0)
@@ -48,8 +48,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
                 random.Random(i).shuffle(data)
                 self.data.extend(data)
         self.graph_lists = []
-        self.graph_labels = []
         self._prepare(features, label)
+        self.graph_labels = precomputed_labels[:len(self.graph_lists)]
 
     def _prepare(self, features, label):
         #print("preparing %d graphs for the %sx
@@ -79,7 +79,6 @@ class StructureAwareGraph(torch.utils.data.Dataset):
                 [np.array(x) for x in np.array([f(g) for f in features]).transpose()])
 
             self.graph_lists.append(g)
-            self.graph_labels.append(len(self.graph_lists))
 
         print()
 
@@ -101,10 +100,16 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.name = name
         data_dir = 'data/'
         with open(data_dir + name + '.pkl', "rb") as f:
+            # Get precomputed labels from file
+            self.precomputed_labels = []
+            train_labels = list(map(float, open("data/precomputed_distances/train128.txt").read().split(",")))
+            val_labels = list(map(float, open("data/precomputed_distances/val128.txt").read().split(",")))
+            test_labels = list(map(float, open("data/precomputed_distances/test128.txt").read().split(",")))
+            # Load graphs
             f = pickle.load(f)
-            self.train = StructureAwareGraph(f[0], features, label, max_graphs)
-            self.val = StructureAwareGraph(f[1], features, label, max_graphs)
-            self.test = StructureAwareGraph(f[2], features, label, max_graphs)
+            self.train = StructureAwareGraph(f[0], features, label, max_graphs, train_labels)
+            self.val = StructureAwareGraph(f[1], features, label, max_graphs, val_labels)
+            self.test = StructureAwareGraph(f[2], features, label, max_graphs, test_labels)
             self.num_atom_type = f[3]
             self.num_bond_type = f[4]
         if verbose:
@@ -116,15 +121,6 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.total_graphs = (self.train.num_graphs
                              + self.val.num_graphs
                              + self.test.num_graphs)
-
-        #'''
-        # Get precomputed labels from file
-        self.precomputed_labels = []
-        self.precomputed_labels.extend(open("data/precomputed_distances/train128.txt").read().split(",")[:self.train.num_graphs])
-        self.precomputed_labels.extend(open("data/precomputed_distances/test128.txt").read().split(",")[:self.test.num_graphs])
-        self.precomputed_labels.extend(open("data/precomputed_distances/val128.txt").read().split(",")[:self.val.num_graphs])
-        self.precomputed_labels = list(map(float, self.precomputed_labels))
-        #'''
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
@@ -140,12 +136,11 @@ class MoleculeDataset(torch.utils.data.Dataset):
                 self.distances[(g1,g2)] = graph_distance(g1, g2)**2
             l.append(self.distances[(g1,g2)])
         '''
-        #'''
+        '''
         l = self.precomputed_labels[:len(samples)]
         self.precomputed_labels = self.precomputed_labels[len(samples):]
-
-        #'''
-        labels = torch.cuda.FloatTensor(l)
+        '''
+        #labels = torch.cuda.FloatTensor(l)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
         snorm_n = torch.cat(tab_snorm_n).sqrt()
