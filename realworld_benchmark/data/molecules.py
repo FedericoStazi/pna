@@ -123,7 +123,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.precomputed_labels.extend(open("data/precomputed_distances/train128.txt").read().split(",")[:self.train.num_graphs])
         self.precomputed_labels.extend(open("data/precomputed_distances/test128.txt").read().split(",")[:self.test.num_graphs])
         self.precomputed_labels.extend(open("data/precomputed_distances/val128.txt").read().split(",")[:self.val.num_graphs])
-        self.precomputed_labels = list(map(int, self.precomputed_labels))
+        self.precomputed_labels = list(map(float, self.precomputed_labels))
         #'''
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
