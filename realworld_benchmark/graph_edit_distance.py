@@ -25,7 +25,7 @@ def embedding_distances(embeddings, distance_function):
     elif distance_function == "L2":
         return torch.mean((a-b)**2, dim=1)
     elif distance_function == "cos":
-        return torch.nn.CosineSimilarity()
+        return torch.nn.CosineSimilarity()(a,b)
     else:
         return None
 
