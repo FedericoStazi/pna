@@ -53,6 +53,7 @@ class EIGNet(nn.Module):
                                     pretrans_layers=pretrans_layers, posttrans_layers=posttrans_layers).model)
 
 
+        print("EMBEDDING SIZE", embedding_size)
         self.MLP_layer = MLPReadout(out_dim, embedding_size)
 
 
