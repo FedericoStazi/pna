@@ -64,14 +64,14 @@ def evaluate_network(model, device, data_loader, epoch):
             mse = MSE(batch_scores, batch_targets, model.distance_function)
             mae = MAE(batch_scores, batch_targets, model.distance_function)
             mape = MAPE(batch_scores, batch_targets, model.distance_function)
-            epoch_train_mse += mse
-            epoch_train_mae += mae
-            epoch_train_mape += mape
+            epoch_test_mse += mse
+            epoch_test_mae += mae
+            epoch_test_mape += mape
             #print("\nval ", batch_scores, batch_targets, mae)
             nb_data += batch_targets.size(0)
         epoch_test_loss /= (iter + 1)
-        epoch_train_mse /= (iter + 1)
-        epoch_train_mae /= (iter + 1)
-        epoch_train_mape /= (iter + 1)
+        epoch_test_mse /= (iter + 1)
+        epoch_test_mae /= (iter + 1)
+        epoch_test_mape /= (iter + 1)
         
-    return epoch_test_loss, epoch_test_mae
+    return epoch_test_loss, (epoch_test_mse, epoch_test_mae, epoch_test_mape)
