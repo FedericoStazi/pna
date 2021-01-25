@@ -56,7 +56,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         # set..." % (self.num_graphs, self.split.upper()))
 
         for molecule in self.data:
-            print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
+            eprint("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
 
             #atom_features = molecule['atom_type'].long()
 
