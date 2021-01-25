@@ -1,8 +1,5 @@
 channels:
-- pytorch
-- dglteam
 - conda-forge
-- fragcolor
 dependencies:
 - cuda10.0
 - cudatoolkit=10.0
