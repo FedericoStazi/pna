@@ -158,9 +158,9 @@ def train_val_pipeline(dataset, params, net_params, dirs):
 
                 t.set_postfix(time=time.time() - start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
-                              train_MSE=train_mse.item(), val_MSE=val_mse.item(), test_MSE=test_mse.item(),
-                              train_MAE=train_mae.item(), val_MAE=val_mae.item(), test_MAE=test_mae.item(),
-                              train_MAPE=train_mape.item(), val_MAPE=val_mape.item(), test_MAPE=test_mape.item(),
+                              train_MSE=train_mse, val_MSE=val_mse, test_MSE=test_mse,
+                              train_MAE=train_mae, val_MAE=val_mae, test_MAE=test_mae,
+                              train_MAPE=train_mape, val_MAPE=val_mape, test_MAPE=test_mape,
                               refresh=False)
 
                 per_epoch_time.append(time.time() - start)
