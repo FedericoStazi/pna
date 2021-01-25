@@ -148,12 +148,12 @@ def train_val_pipeline(dataset, params, net_params, dirs):
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
-                writer.add_scalar('train/_mse', mse, epoch)
-                writer.add_scalar('train/_mae', mae, epoch)
-                writer.add_scalar('train/_mape', mape, epoch)
-                writer.add_scalar('train/_mse', mse, epoch)
-                writer.add_scalar('train/_mae', mae, epoch)
-                writer.add_scalar('train/_mape', mape, epoch)
+                writer.add_scalar('train/_mse', train_mse, epoch)
+                writer.add_scalar('train/_mae', train_mae, epoch)
+                writer.add_scalar('train/_mape', train_mape, epoch)
+                writer.add_scalar('val/_mse', val_mse, epoch)
+                writer.add_scalar('val/_mae', val_mae, epoch)
+                writer.add_scalar('val/_mape', val_mape, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
                 t.set_postfix(time=time.time() - start, lr=optimizer.param_groups[0]['lr'],
