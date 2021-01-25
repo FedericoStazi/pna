@@ -131,18 +131,20 @@ def train_val_pipeline(dataset, params, net_params, dirs):
 
                 epoch_train_loss, epoch_train_error_, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
                 epoch_train_error = [x.detach().cpu().item() for x in epoch_train_error_]
+                train_mse, train_mae, train_mape = epoch_train_error
                 
                 epoch_val_loss, epoch_val_error_ = evaluate_network(model, device, val_loader, epoch)
                 epoch_val_error = [x.detach().cpu().item() for x in epoch_val_error_]
+                val_mse, val_mae, val_mape = epoch_val_error
+                
+                _, epoch_test_error_ = evaluate_network(model, device, test_loader, epoch)
+                epoch_test_error = [x.detach().cpu().item() for x in epoch_test_error_]
+                test_mse, test_mae, test_mape = epoch_test_error
 
                 epoch_train_losses.append(epoch_train_loss)
                 epoch_val_losses.append(epoch_val_loss)
                 epoch_train_errors.append(epoch_train_error)
                 epoch_val_errors.append(epoch_val_error)
-
-                train_mse, train_mae, train_mape = epoch_train_error
-                val_mse, val_mae, val_mape = epoch_val_error
-                test_mse, test_mae, test_mape = epoch_test_error
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
@@ -154,12 +156,11 @@ def train_val_pipeline(dataset, params, net_params, dirs):
                 writer.add_scalar('train/_mape', mape, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_error = evaluate_network(model, device, test_loader, epoch)
                 t.set_postfix(time=time.time() - start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
-                              train_MSE=train_mae.item(), val_MSE=val_mae.item(), test_MSE=test_mae.item(),
+                              train_MSE=train_mse.item(), val_MSE=val_mse.item(), test_MSE=test_mse.item(),
                               train_MAE=train_mae.item(), val_MAE=val_mae.item(), test_MAE=test_mae.item(),
-                              train_MAPE=train_mae.item(), val_MAPE=val_mae.item(), test_MAPE=test_mae.item(),
+                              train_MAPE=train_mape.item(), val_MAPE=val_mape.item(), test_MAPE=test_mape.item(),
                               refresh=False)
 
                 per_epoch_time.append(time.time() - start)
