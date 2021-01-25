@@ -45,7 +45,7 @@ def train_epoch(model, optimizer, device, data_loader, epoch):
     epoch_train_mae /= (iter + 1)
     epoch_train_mape /= (iter + 1)
 
-    return epoch_loss, (epoch_train_mse, epoch_train_mae, epoch_train_mape), optimizer
+    return epoch_loss, [epoch_train_mse, epoch_train_mae, epoch_train_mape], optimizer
 
 def evaluate_network(model, device, data_loader, epoch):
     model.eval()
@@ -78,4 +78,4 @@ def evaluate_network(model, device, data_loader, epoch):
         epoch_test_mae /= (iter + 1)
         epoch_test_mape /= (iter + 1)
         
-    return epoch_test_loss, (epoch_test_mse, epoch_test_mae, epoch_test_mape)
+    return epoch_test_loss, [epoch_test_mse, epoch_test_mae, epoch_test_mape]
