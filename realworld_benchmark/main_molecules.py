@@ -222,11 +222,16 @@ def train_val_pipeline(dataset, params, net_params, dirs):
     """
     with open(write_file_name + '.txt', 'w') as f:
         f.write("""Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n{}\n\nTotal Parameters: {}\n\n
-    FINAL RESULTS\nTEST MAE: {:.4f}\nTRAIN MAE: {:.4f}\n\n
+    FINAL RESULTS\n
+    TEST MSE: {:.4f}\nTRAIN MSE: {:.4f}\n
+    TEST MAE: {:.4f}\nTRAIN MAE: {:.4f}\n
+    TEST MAPE: {:.4f}\nTRAIN MAPE: {:.4f}\n\n
     Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n""" \
                 .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
-                        np.mean(np.array(test_error)), np.array(train_error), (time.time() - t0) / 3600,
-                        np.mean(per_epoch_time)))
+                        np.mean(np.array(test_mse)), np.array(train_mse),
+                        np.mean(np.array(test_mae)), np.array(train_mae),
+                        np.mean(np.array(test_mape)), np.array(train_mape),
+                        (time.time() - t0) / 3600, np.mean(per_epoch_time)))
 
 
 def main():
