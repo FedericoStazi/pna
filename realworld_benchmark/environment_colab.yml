@@ -1,5 +1,6 @@
 channels:
 - conda-forge
+- anaconda
 dependencies:
 - cuda10.0
 - cudatoolkit=10.0
