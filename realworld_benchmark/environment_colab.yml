@@ -1,4 +1,5 @@
 channels:
+- pytorch
 - dglteam
 - conda-forge
 - fragcolor
