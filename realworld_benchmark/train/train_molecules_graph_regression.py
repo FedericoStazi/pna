@@ -15,7 +15,9 @@ from .metrics import MSE, MAE, MAPE
 def train_epoch(model, optimizer, device, data_loader, epoch):
     model.train()
     epoch_loss = 0
+    epoch_train_mse = 0
     epoch_train_mae = 0
+    epoch_train_mape = 0
     nb_data = 0
     gpu_mem = 0
     for iter, (batch_graphs, batch_targets, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
@@ -48,7 +50,9 @@ def train_epoch(model, optimizer, device, data_loader, epoch):
 def evaluate_network(model, device, data_loader, epoch):
     model.eval()
     epoch_test_loss = 0
+    epoch_test_mse = 0
     epoch_test_mae = 0
+    epoch_test_mape = 0
     nb_data = 0
     with torch.no_grad():
         for iter, (batch_graphs, batch_targets, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
