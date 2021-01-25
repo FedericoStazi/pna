@@ -129,17 +129,20 @@ def train_val_pipeline(dataset, params, net_params, dirs):
 
                 start = time.time()
 
-                epoch_train_loss, epoch_train_error, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
-                epoch_val_loss, epoch_val_error = evaluate_network(model, device, val_loader, epoch)
+                epoch_train_loss, epoch_train_error_, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
+                epoch_train_error = [x.detach().cpu().item() for x in epoch_train_error_]
+                
+                epoch_val_loss, epoch_val_error_ = evaluate_network(model, device, val_loader, epoch)
+                epoch_val_error = [x.detach().cpu().item() for x in epoch_val_error_]
 
                 epoch_train_losses.append(epoch_train_loss)
                 epoch_val_losses.append(epoch_val_loss)
-                epoch_train_errors.append(epoch_train_error.detach().cpu().item())
-                epoch_val_errors.append(epoch_val_error.detach().cpu().item())
+                epoch_train_errors.append(epoch_train_error)
+                epoch_val_errors.append(epoch_val_error)
 
-                train_mse, train_mae, train_mape = epoch_train_error.item()
-                val_mse, val_mae, val_mape = epoch_val_error.item()
-                test_mse, test_mae, test_mape = epoch_test_error.item()
+                train_mse, train_mae, train_mape = epoch_train_error
+                val_mse, val_mae, val_mape = epoch_val_error
+                test_mse, test_mae, test_mape = epoch_test_error
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
