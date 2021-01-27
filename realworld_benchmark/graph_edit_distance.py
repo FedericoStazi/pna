@@ -39,7 +39,7 @@ def euclidean_distance(t1_emb, t2_emb):
     return d
 
 def cosine_distance(t1_emb, t2_emb):
-    return 1 - nn.CosineSimilarity(dim=-1, eps=1e-6)(t1_emb, t2_emb)
+    return 1 - torch.nn.CosineSimilarity(dim=-1, eps=1e-6)(t1_emb, t2_emb)
 
 def manhattan_distance(t1_emb, t2_emb):
     D = t1_emb - t2_emb
