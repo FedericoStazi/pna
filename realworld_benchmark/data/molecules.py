@@ -10,6 +10,7 @@ import time
 import numpy as np
 import csv
 import dgl
+import math
 from scipy import sparse as sp
 import numpy as np
 import networkx.algorithms.similarity as nx_sim
@@ -52,13 +53,9 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.graph_labels = precomputed_labels[:len(self.graph_lists)]
 
     def _prepare(self, features, label):
-        #print("preparing %d graphs for the %sx
-        # set..." % (self.num_graphs, self.split.upper()))
 
         for molecule in self.data:
             eprint("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
-
-            #atom_features = molecule['atom_type'].long()
 
             adj = molecule['bond_type']
             edge_list = (adj != 0).nonzero()  # converting adj matrix to edge_list
@@ -126,20 +123,16 @@ class MoleculeDataset(torch.utils.data.Dataset):
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
-        '''
-        l = []
-        if len(self.distances) < self.total_graphs:
-            print("\r", len(self.distances), " / ", self.total_graphs, end = " ")
-        graphs_shift = [graphs[-1]] + graphs[:-1]
-        for g1,g2 in zip(graphs, graphs_shift):
-            if (g1,g2) not in self.distances:
-                self.distances[(g1,g2)] = graph_distance(g1, g2)**2
-            l.append(self.distances[(g1,g2)])
-        '''
-        '''
-        l = self.precomputed_labels[:len(samples)]
-        self.precomputed_labels = self.precomputed_labels[len(samples):]
-        '''
+
+        # Normalization of labels
+        number_of_nodes = [g.number_of_nodes() for g in graphs]
+        for i in len(graphs):
+            x = 2.0 * labels[i] / (number_of_nodes[(i-1)%len(graphs)] +
+                                   number_of_nodes[i])
+            labels[i] = math.exp(-x)
+
+        print(labels)
+
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
