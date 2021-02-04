@@ -55,7 +55,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
     def _prepare(self, features, label):
 
         for molecule in self.data:
-            eprint("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
+            #print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
 
             adj = molecule['bond_type']
             edge_list = (adj != 0).nonzero()  # converting adj matrix to edge_list
