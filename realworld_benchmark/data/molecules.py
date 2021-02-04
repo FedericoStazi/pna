@@ -129,9 +129,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         for i in range(len(graphs)):
             x = 2.0 * labels[i] / (number_of_nodes[(i-1)%len(graphs)] +
                                    number_of_nodes[i])
-            labels[i] = math.exp(-x)
-
-        print(labels)
+            labels[i] = 1.0 - math.exp(-x)
 
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
