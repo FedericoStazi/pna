@@ -102,6 +102,11 @@ class MoleculeDataset(torch.utils.data.Dataset):
             train_labels = list(map(float, open("data/precomputed_distances/train128.txt").read().split(",")))
             val_labels = list(map(float, open("data/precomputed_distances/val128.txt").read().split(",")))
             test_labels = list(map(float, open("data/precomputed_distances/test128.txt").read().split(",")))
+            self.max_distance = max(
+                max(train_labels),
+                max(val_labels),
+                max(test_labels)
+            )
             # Load graphs
             f = pickle.load(f)
             self.train = StructureAwareGraph(f[0], features, label, max_graphs, train_labels)
@@ -125,13 +130,14 @@ class MoleculeDataset(torch.utils.data.Dataset):
         graphs, labels = map(list, zip(*samples))
 
         # Normalization of labels
+        '''
         number_of_nodes = [g.number_of_nodes() for g in graphs]
         for i in len(graphs):
             x = 2.0 * labels[i] / (number_of_nodes[(i-1)%len(graphs)] +
                                    number_of_nodes[i])
             labels[i] = math.exp(-x)
-
-        print(labels)
+        '''
+        labels /= self.max_distance
 
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]

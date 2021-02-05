@@ -25,6 +25,8 @@ def embedding_distances(embeddings, distance_function):
         return square_distance(a,b)
     elif distance_function == "cos":
         return cosine_distance(a,b)
+    elif distance_function == "hyp":
+        return hyperbolic_distance(a,b)
     else:
         return None
 
@@ -45,6 +47,14 @@ def manhattan_distance(t1_emb, t2_emb):
     D = t1_emb - t2_emb
     d = torch.sum(torch.abs(D), dim=-1)
     return d
+
+def hyperbolic_distance(u, v, epsilon=1e-7):
+    sqdist = torch.sum((u - v) ** 2, dim=-1)
+    squnorm = torch.sum(u ** 2, dim=-1)
+    sqvnorm = torch.sum(v ** 2, dim=-1)
+    x = 1 + 2 * sqdist / ((1 - squnorm) * (1 - sqvnorm)) + epsilon
+    z = torch.sqrt(x ** 2 - 1)
+    return torch.log(x + z)
 
 # Graph Distances
 
