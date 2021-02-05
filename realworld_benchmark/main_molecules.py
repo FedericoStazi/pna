@@ -301,6 +301,7 @@ def main():
     parser.add_argument('--max_graphs', type=int, help='Maximum number of graphs considered')
     parser.add_argument('--embedding_size', type=int, help='Size of the graph embedding')
     parser.add_argument('--distance_function', type=str, help='Embeddings distance function')
+    parser.add_argument('--normalization', type=str, help='Divide distances by max (Yes/No)')
 
     args = parser.parse_args()
     print(args.config)
@@ -320,8 +321,9 @@ def main():
         DATASET_NAME = config['dataset']
 
     print(DATASET_NAME)
+    distances_normalization = True if args.normalization == 'Yes' else False
     dataset = MoleculeDataset(DATASET_NAME, [NODE_INFORMATION[feature] for feature in args.features.split()],
-                              NODE_INFORMATION[args.label], args.max_graphs, norm=args.lap_norm)
+                              NODE_INFORMATION[args.label], args.max_graphs, normalization=distances_normalization)
     if args.out_dir is not None:
         out_dir = args.out_dir
     else:
