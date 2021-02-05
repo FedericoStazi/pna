@@ -123,6 +123,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.total_graphs = (self.train.num_graphs
                              + self.val.num_graphs
                              + self.test.num_graphs)
+        self.normalization = normalization
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
@@ -137,7 +138,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
                                    number_of_nodes[i])
             labels[i] = math.exp(-x)
         '''
-        if normalization:
+        if self.normalization:
             labels = [x / self.max_distance for x in labels]
         print(labels[:10])
 
