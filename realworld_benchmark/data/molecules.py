@@ -132,7 +132,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         # Normalization of labels
         '''
         number_of_nodes = [g.number_of_nodes() for g in graphs]
-        for i in len(graphs):
+        for i in range(len(graphs)):
             x = 2.0 * labels[i] / (number_of_nodes[(i-1)%len(graphs)] +
                                    number_of_nodes[i])
             labels[i] = math.exp(-x)
