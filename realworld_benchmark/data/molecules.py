@@ -87,7 +87,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
 class MoleculeDataset(torch.utils.data.Dataset):
 
-    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True):
+    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True, normalization=True):
         """
             Loading SBM datasets
         """
@@ -137,7 +137,9 @@ class MoleculeDataset(torch.utils.data.Dataset):
                                    number_of_nodes[i])
             labels[i] = math.exp(-x)
         '''
-        labels = [x / self.max_distance for x in labels]
+        if normalization:
+            labels = [x / self.max_distance for x in labels]
+        print(labels[:10])
 
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
