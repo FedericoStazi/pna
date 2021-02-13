@@ -81,7 +81,7 @@ def evaluate_network(model, device, data_loader, epoch):
     return epoch_test_loss, [epoch_test_mse, epoch_test_mae, epoch_test_mape]
 
 
-def get_predictions(model, device, data_loader):
+def get_predictions(model, device, data_loader, epoch):
     model.eval()
     targets = []
     scores = []
