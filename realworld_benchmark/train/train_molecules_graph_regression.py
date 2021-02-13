@@ -95,9 +95,6 @@ def get_predictions(model, device, data_loader, epoch):
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
             loss = model.loss(batch_scores, batch_targets)
-
             scores += embedding_distances(batch_scores, model.distance_function).flatten().tolist()
-            print("a ", embedding_distances(batch_scores, model.distance_function).flatten().tolist())
             targets += batch_targets.flatten().tolist()
-            print("b ", batch_targets.flatten().tolist())
     return targets, scores
