@@ -11,6 +11,7 @@ import torch.nn as nn
 import math
 
 from .metrics import MSE, MAE, MAPE
+from graph_edit_distance import embedding_distances
 
 def train_epoch(model, optimizer, device, data_loader, epoch):
     model.train()
@@ -91,7 +92,7 @@ def get_predictions(model, device, data_loader, epoch):
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_snorm_e = batch_snorm_e.to(device)
             batch_targets = batch_targets.to(device)
-            targets += batch_targets.flatten().tolist()
+            targets += embedding_distances(batch_targets.flatten().tolist(), model.distance_function)
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
             scores += batch_scores.flatten().tolist()
