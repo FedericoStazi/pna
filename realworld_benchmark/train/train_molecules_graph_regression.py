@@ -91,8 +91,8 @@ def get_predictions(model, device, data_loader, epoch):
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_snorm_e = batch_snorm_e.to(device)
             batch_targets = batch_targets.to(device)
-            targets += batch_targets.toList()
+            targets += batch_targets.flatten().toList()
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
-            scores += batch_scores.toList()
+            scores += batch_scores.flatten().toList()
     return targets, scores
