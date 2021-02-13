@@ -92,8 +92,10 @@ def get_predictions(model, device, data_loader, epoch):
             batch_e = batch_graphs.edata['feat'].to(device)
             batch_snorm_e = batch_snorm_e.to(device)
             batch_targets = batch_targets.to(device)
-            targets += embedding_distances(batch_targets, model.distance_function).flatten().tolist()
             batch_snorm_n = batch_snorm_n.to(device)
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
+            targets += embedding_distances(batch_targets, model.distance_function).flatten().tolist()
+            print("a" + embedding_distances(batch_targets, model.distance_function).flatten().tolist())
             scores += batch_scores.flatten().tolist()
+            print("b " + batch_scores.flatten().tolist())
     return targets, scores
