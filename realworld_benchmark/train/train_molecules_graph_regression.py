@@ -79,3 +79,20 @@ def evaluate_network(model, device, data_loader, epoch):
         epoch_test_mape /= (iter + 1)
         
     return epoch_test_loss, [epoch_test_mse, epoch_test_mae, epoch_test_mape]
+
+
+def get_predictions(model, device, data_loader):
+    model.eval()
+    targets = []
+    scores = []
+    with torch.no_grad():
+        for iter, (batch_graphs, batch_targets, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
+            batch_x = batch_graphs.ndata['feat'].to(device)
+            batch_e = batch_graphs.edata['feat'].to(device)
+            batch_snorm_e = batch_snorm_e.to(device)
+            batch_targets = batch_targets.to(device)
+            targets.append(batch_targets)
+            batch_snorm_n = batch_snorm_n.to(device)
+            batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
+            scores.append(batch_scores)
+    return targets, scores
