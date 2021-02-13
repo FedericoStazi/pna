@@ -187,7 +187,7 @@ def train_val_pipeline(dataset, params, net_params, dirs):
     _, test_error = evaluate_network(model, device, test_loader, epoch)
     _, val_error = evaluate_network(model, device, val_loader, epoch)
     _, train_error = evaluate_network(model, device, train_loader, epoch)
-    targets. scores = get_predictions(model, device, train_loader, epoch)
+    targets, scores = get_predictions(model, device, train_loader, epoch)
 
     train_mse, train_mae, train_mape = train_error
     val_mse, val_mae, val_mape = val_error
