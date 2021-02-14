@@ -135,7 +135,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
             labels = [x / self.max_distance for x in labels]
 
         labels = [-x for x in labels]
-        for i in range(0, len(labels), 10):
+        for i in range(0, len(labels), 2):
             labels[i] = -labels[i]
 
 
