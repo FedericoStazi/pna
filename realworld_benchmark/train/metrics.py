@@ -12,7 +12,7 @@ import numpy as np
 from graph_edit_distance import embedding_distances
 
 def filter_positive(l):
-    return filter(lambda x : x>0, l)
+    return list(filter(lambda x : x>0, l))
 
 
 def MAE(scores, targets, distance_function):
