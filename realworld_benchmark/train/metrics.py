@@ -11,16 +11,24 @@ from sklearn.metrics import f1_score
 import numpy as np
 from graph_edit_distance import embedding_distances
 
+def filter_positive(l):
+    return filter(lambda x : x>0, l)
+
 
 def MAE(scores, targets, distance_function):
-    MAE = F.l1_loss(embedding_distances(scores, distance_function), targets)
+    distances = filter_positive(embedding_distances(scores, distance_function))
+    targets = filter_positive(targets)
+    MAE = F.l1_loss(distances, targets)
     return MAE
 
 def MSE(scores, targets, distance_function):
-    MSE = F.mse_loss(embedding_distances(scores, distance_function), targets)
+    distances = filter_positive(embedding_distances(scores, distance_function))
+    targets = filter_positive(targets)
+    MSE = F.mse_loss(distances, targets)
     return MSE
 
 def MAPE(scores, targets, distance_function):
-    distances = embedding_distances(scores, distance_function)
+    distances = filter_positive(embedding_distances(scores, distance_function))
+    targets = filter_positive(targets)
     MAPE = torch.mean(F.l1_loss(distances, targets, reduction='none') / torch.abs(distances))
     return MAPE

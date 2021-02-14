@@ -17,7 +17,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-K = 10
+max_batch_distances = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -43,8 +43,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.data = molecule_dgl.data[:max_graphs]
         self.num_graphs = self.n_samples = max_graphs
         if (self.split == "train"):
-            self.num_graphs = self.n_samples = K * self.num_graphs
-            for i in range(K-1):
+            self.num_graphs = self.n_samples = max_batch_distances * self.num_graphs
+            for i in range(max_batch_distances - 1):
                 data = molecule_dgl.data[:max_graphs]
                 random.Random(i).shuffle(data)
                 self.data.extend(data)
@@ -131,15 +131,13 @@ class MoleculeDataset(torch.utils.data.Dataset):
         graphs, labels = map(list, zip(*samples))
 
         # Normalization of labels
-        '''
-        number_of_nodes = [g.number_of_nodes() for g in graphs]
-        for i in range(len(graphs)):
-            x = 2.0 * labels[i] / (number_of_nodes[(i-1)%len(graphs)] +
-                                   number_of_nodes[i])
-            labels[i] = math.exp(-x)
-        '''
         if self.normalization:
             labels = [x / self.max_distance for x in labels]
+
+        labels = [-x for x in labels]
+        for i in range(0, len(labels), 10):
+            labels[i] = -labels[i]
+
 
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
