@@ -14,18 +14,18 @@ from graph_edit_distance import embedding_distances
 
 def MAE(scores, targets, distance_function):
     distances = embedding_distances(scores, distance_function)
-    valid = distances > 0
+    valid = targets > 0
     MAE = F.l1_loss(distances[valid], targets[valid])
     return MAE
 
 def MSE(scores, targets, distance_function):
     distances = embedding_distances(scores, distance_function)
-    valid = distances > 0
+    valid = targets > 0
     MSE = F.mse_loss(distances[valid], targets[valid])
     return MSE
 
 def MAPE(scores, targets, distance_function):
     distances = embedding_distances(scores, distance_function)
-    valid = distances > 0
-    MAPE = torch.mean(F.l1_loss(distances[valid], targets[valid], reduction='none') / torch.abs(distances))
+    valid = targets > 0
+    MAPE = torch.mean(F.l1_loss(distances[valid], targets[valid], reduction='none') / torch.abs(distances[valid]))
     return MAPE
