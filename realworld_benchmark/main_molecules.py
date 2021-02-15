@@ -203,6 +203,7 @@ def train_val_pipeline(dataset, params, net_params, dirs):
     val_mape = val_mape.item()
     train_mape = train_mape.item()
 
+    max_print = 100
     print(params['features'] + " ---> " + params['label'])
     print("Train MSE: {:.16f}".format(train_mse))
     print("Val MSE: {:.16f}".format(val_mse))
@@ -215,8 +216,8 @@ def train_val_pipeline(dataset, params, net_params, dirs):
     print("Test MAPE: {:.16f}".format(test_mape))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - t0))
     print("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
-    print("Targets: ", ", ".join(["%0.3f" % x for x in targets]))
-    print("Scores: ", ", ".join(["%0.3f" % x for x in scores]))
+    print("Targets: ", ", ".join(["%0.3f" % x for x in targets[:max_print]]))
+    print("Scores: ", ", ".join(["%0.3f" % x for x in scores[:max_print]]))
 
     writer.close()
 
