@@ -10,6 +10,7 @@ import time
 import numpy as np
 import csv
 import dgl
+import math
 from scipy import sparse as sp
 import numpy as np
 import networkx.algorithms.similarity as nx_sim
@@ -127,12 +128,12 @@ class MoleculeDataset(torch.utils.data.Dataset):
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
+        graphs, labels = map(list, zip(*samples))
         
         # Normalization of labels
         if self.normalization:
             labels = [x / self.max_distance for x in labels]
         
-        graphs, labels = map(list, zip(*samples))
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
