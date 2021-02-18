@@ -17,7 +17,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-max_batch_distances = 1
+max_batch_distances = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -87,7 +87,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
 class MoleculeDataset(torch.utils.data.Dataset):
 
-    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True, normalization=True):
+    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True, normalization=False):
         """
             Loading SBM datasets
         """
