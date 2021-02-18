@@ -16,7 +16,7 @@ import networkx.algorithms.similarity as nx_sim
 from graph_edit_distance import graph_distance
 
 EPS = 1e-5
-K = 10
+max_batch_distances = 10
 
 # Can be removed?
 class MoleculeDGL(torch.utils.data.Dataset):
@@ -42,8 +42,8 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.data = molecule_dgl.data[:max_graphs]
         self.num_graphs = self.n_samples = max_graphs
         if (self.split == "train"):
-            self.num_graphs = self.n_samples = K * self.num_graphs
-            for i in range(K-1):
+            self.num_graphs = self.n_samples = max_batch_distances * self.num_graphs
+            for i in range(max_batch_distances - 1):
                 data = molecule_dgl.data[:max_graphs]
                 random.Random(i).shuffle(data)
                 self.data.extend(data)
@@ -52,13 +52,9 @@ class StructureAwareGraph(torch.utils.data.Dataset):
         self.graph_labels = precomputed_labels[:len(self.graph_lists)]
 
     def _prepare(self, features, label):
-        #print("preparing %d graphs for the %sx
-        # set..." % (self.num_graphs, self.split.upper()))
 
         for molecule in self.data:
-            print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
-
-            #atom_features = molecule['atom_type'].long()
+            #print("\rgraph %d out of %d" % (len(self.graph_lists), len(self.data)), end="")
 
             adj = molecule['bond_type']
             edge_list = (adj != 0).nonzero()  # converting adj matrix to edge_list
@@ -90,7 +86,7 @@ class StructureAwareGraph(torch.utils.data.Dataset):
 
 class MoleculeDataset(torch.utils.data.Dataset):
 
-    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True):
+    def __init__(self, name, features, label, max_graphs, norm='none', verbose=True, normalization=False):
         """
             Loading SBM datasets
         """
@@ -105,6 +101,11 @@ class MoleculeDataset(torch.utils.data.Dataset):
             train_labels = list(map(float, open("data/precomputed_distances/train128.txt").read().split(",")))
             val_labels = list(map(float, open("data/precomputed_distances/val128.txt").read().split(",")))
             test_labels = list(map(float, open("data/precomputed_distances/test128.txt").read().split(",")))
+            self.max_distance = max(
+                max(train_labels),
+                max(val_labels),
+                max(test_labels)
+            )
             # Load graphs
             f = pickle.load(f)
             self.train = StructureAwareGraph(f[0], features, label, max_graphs, train_labels)
@@ -121,25 +122,17 @@ class MoleculeDataset(torch.utils.data.Dataset):
         self.total_graphs = (self.train.num_graphs
                              + self.val.num_graphs
                              + self.test.num_graphs)
+        self.normalization = normalization
 
     # form a mini batch from a given list of samples = [(graph, label) pairs]
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
+        
+        # Normalization of labels
+        if self.normalization:
+            labels = [x / self.max_distance for x in labels]
+        
         graphs, labels = map(list, zip(*samples))
-        '''
-        l = []
-        if len(self.distances) < self.total_graphs:
-            print("\r", len(self.distances), " / ", self.total_graphs, end = " ")
-        graphs_shift = [graphs[-1]] + graphs[:-1]
-        for g1,g2 in zip(graphs, graphs_shift):
-            if (g1,g2) not in self.distances:
-                self.distances[(g1,g2)] = graph_distance(g1, g2)**2
-            l.append(self.distances[(g1,g2)])
-        '''
-        '''
-        l = self.precomputed_labels[:len(samples)]
-        self.precomputed_labels = self.precomputed_labels[len(samples):]
-        '''
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
