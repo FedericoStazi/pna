@@ -133,7 +133,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         # Normalization of labels
         if self.normalization:
             labels = [x / self.max_distance for x in labels]
-        
+ 
         labels = torch.cuda.FloatTensor(labels)
         tab_sizes_n = [graphs[i].number_of_nodes() for i in range(len(graphs))]
         tab_snorm_n = [torch.FloatTensor(size, 1).fill_(1. / float(size)) for size in tab_sizes_n]
