@@ -10,7 +10,8 @@ import torch
 import torch.nn as nn
 import math
 
-from .metrics import MAE
+from .metrics import MSE, MAE, MAPE
+from graph_edit_distance import embedding_distances
 
 def train_epoch(model, optimizer, device, data_loader, epoch):
     model.train()
@@ -31,7 +32,6 @@ def train_epoch(model, optimizer, device, data_loader, epoch):
         optimizer.step()
         epoch_loss += loss.detach().item()
         mae = MAE(batch_scores, batch_targets, model.distance_function)
-        #print("\ntrain ", batch_scores, batch_targets, mae)
         epoch_train_mae += mae
         nb_data += batch_targets.size(0)
     epoch_loss /= (iter + 1)
@@ -42,7 +42,9 @@ def train_epoch(model, optimizer, device, data_loader, epoch):
 def evaluate_network(model, device, data_loader, epoch):
     model.eval()
     epoch_test_loss = 0
+    epoch_test_mse = 0
     epoch_test_mae = 0
+    epoch_test_mape = 0
     nb_data = 0
     with torch.no_grad():
         for iter, (batch_graphs, batch_targets, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
@@ -55,11 +57,34 @@ def evaluate_network(model, device, data_loader, epoch):
             batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
             loss = model.loss(batch_scores, batch_targets)
             epoch_test_loss += loss.detach().item()
+            mse = MSE(batch_scores, batch_targets, model.distance_function)
             mae = MAE(batch_scores, batch_targets, model.distance_function)
-            #print("\neval ", batch_scores, batch_targets, mae)
+            mape = MAPE(batch_scores, batch_targets, model.distance_function)
+            epoch_test_mse += mse
             epoch_test_mae += mae
+            epoch_test_mape += mape
+            #print("\nval ", batch_scores, batch_targets, mae)
             nb_data += batch_targets.size(0)
         epoch_test_loss /= (iter + 1)
+        epoch_test_mse /= (iter + 1)
         epoch_test_mae /= (iter + 1)
+        epoch_test_mape /= (iter + 1)
         
-    return epoch_test_loss, epoch_test_mae
+    return epoch_test_loss, [epoch_test_mse, epoch_test_mae, epoch_test_mape]
+
+
+def get_predictions(model, device, data_loader, epoch):
+    model.eval()
+    targets = []
+    scores = []
+    with torch.no_grad():
+        for iter, (batch_graphs, batch_targets, batch_snorm_n, batch_snorm_e) in enumerate(data_loader):
+            batch_x = batch_graphs.ndata['feat'].to(device)
+            batch_e = batch_graphs.edata['feat'].to(device)
+            batch_snorm_e = batch_snorm_e.to(device)
+            batch_targets = batch_targets.to(device)
+            batch_snorm_n = batch_snorm_n.to(device)
+            batch_scores = model.forward(batch_graphs, batch_x, batch_e, batch_snorm_n, batch_snorm_e)
+            targets += batch_targets.flatten().tolist()
+            scores += embedding_distances(batch_scores, model.distance_function).flatten().tolist()
+    return targets, scores
