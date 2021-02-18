@@ -28,7 +28,7 @@
     "readout": "sum",
     "in_feat_dropout": 0.0,
     "dropout": 0.0,
-    "graph_norm": false,
+    "graph_norm": true,
     "batch_norm": true,
     "aggregators": "mean",
     "scalers": "identity amplification attenuation",
