@@ -11,24 +11,56 @@ from itertools import chain
 from scipy.spatial.distance import cdist
 import networkx as nx
 
-
-def graph_distance(a, b):
-    d,_ = VanillaAED().ged(a.to_networkx().to_undirected(), b.to_networkx().to_undirected())
-    return d
+# Embedding Distances
 
 def embedding_distances(embeddings, distance_function):
     n = len(embeddings)
     a = embeddings.squeeze()
     b = torch.roll(a, 1)
     if distance_function == "L1":
-        return torch.mean(torch.abs(a-b), dim=1)
+        return manhattan_distance(a,b)
     elif distance_function == "L2":
-        return torch.mean((a-b)**2, dim=1)
+        return euclidean_distance(a,b)
+    elif distance_function == "L2^2":
+        return square_distance(a,b)
     elif distance_function == "cos":
-        return torch.nn.CosineSimilarity()(a,b)
+        return cosine_distance(a,b)
+    elif distance_function == "hyp":
+        return hyperbolic_distance(a,b)
     else:
         return None
 
+def square_distance(t1_emb, t2_emb):
+    D = t1_emb - t2_emb
+    d = torch.sum(D * D, dim=-1)
+    return d
+
+def euclidean_distance(t1_emb, t2_emb):
+    D = t1_emb - t2_emb
+    d = torch.norm(D, dim=-1)
+    return d
+
+def cosine_distance(t1_emb, t2_emb):
+    return 1 - torch.nn.CosineSimilarity(dim=-1, eps=1e-6)(t1_emb, t2_emb)
+
+def manhattan_distance(t1_emb, t2_emb):
+    D = t1_emb - t2_emb
+    d = torch.sum(torch.abs(D), dim=-1)
+    return d
+
+def hyperbolic_distance(u, v, epsilon=1e-7):
+    sqdist = torch.sum((u - v) ** 2, dim=-1)
+    squnorm = torch.sum(u ** 2, dim=-1)
+    sqvnorm = torch.sum(v ** 2, dim=-1)
+    x = 1 + 2 * sqdist / ((1 - squnorm) * (1 - sqvnorm)) + epsilon
+    z = torch.sqrt(x ** 2 - 1)
+    return torch.log(x + z)
+
+# Graph Distances
+
+def graph_distance(a, b):
+    d,_ = VanillaAED().ged(a.to_networkx().to_undirected(), b.to_networkx().to_undirected())
+    return d
 
 class GraphEditDistance(object):
     """
