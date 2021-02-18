@@ -129,7 +129,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
     def collate(self, samples):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
-        
+
         # Normalization of labels
         if self.normalization:
             labels = [x / self.max_distance for x in labels]
