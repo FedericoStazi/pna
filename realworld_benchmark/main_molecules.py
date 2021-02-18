@@ -28,7 +28,7 @@ class DotDict(dict):
 """
 from nets.molecules_graph_regression.eig_net import EIGNet
 from data.molecules import MoleculeDataset  # import dataset
-from train.train_molecules_graph_regression import train_epoch, evaluate_network
+from train.train_molecules_graph_regression import train_epoch, evaluate_network, get_predictions
 from node_information import NODE_INFORMATION
 
 """
@@ -112,7 +112,7 @@ def train_val_pipeline(dataset, params, net_params, dirs):
                                                      verbose=True)
 
     epoch_train_losses, epoch_val_losses = [], []
-    epoch_train_MAEs, epoch_val_MAEs = [], []
+    epoch_train_errors, epoch_val_errors = [], []
 
     train_loader = DataLoader(trainset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
     val_loader = DataLoader(valset, batch_size=params['batch_size'], shuffle=False, collate_fn=dataset.collate)
@@ -130,24 +130,40 @@ def train_val_pipeline(dataset, params, net_params, dirs):
                 start = time.time()
 
                 epoch_train_loss, epoch_train_mae, optimizer = train_epoch(model, optimizer, device, train_loader, epoch)
-                epoch_val_loss, epoch_val_mae = evaluate_network(model, device, val_loader, epoch)
+                
+                _, epoch_train_error_ = evaluate_network(model, device, train_loader, epoch)
+                epoch_train_error = [x.detach().cpu().item() for x in epoch_train_error_]
+                train_mse, train_mae, train_mape = epoch_train_error
+                
+                epoch_val_loss, epoch_val_error_ = evaluate_network(model, device, val_loader, epoch)
+                epoch_val_error = [x.detach().cpu().item() for x in epoch_val_error_]
+                val_mse, val_mae, val_mape = epoch_val_error
+                
+                _, epoch_test_error_ = evaluate_network(model, device, test_loader, epoch)
+                epoch_test_error = [x.detach().cpu().item() for x in epoch_test_error_]
+                test_mse, test_mae, test_mape = epoch_test_error
 
                 epoch_train_losses.append(epoch_train_loss)
                 epoch_val_losses.append(epoch_val_loss)
-                epoch_train_MAEs.append(epoch_train_mae.detach().cpu().item())
-                epoch_val_MAEs.append(epoch_val_mae.detach().cpu().item())
+                epoch_train_errors.append(epoch_train_error)
+                epoch_val_errors.append(epoch_val_error)
 
                 writer.add_scalar('train/_loss', epoch_train_loss, epoch)
                 writer.add_scalar('val/_loss', epoch_val_loss, epoch)
-                writer.add_scalar('train/_mae', epoch_train_mae, epoch)
-                writer.add_scalar('val/_mae', epoch_val_mae, epoch)
+                writer.add_scalar('train/_mse', train_mse, epoch)
+                writer.add_scalar('train/_mae', train_mae, epoch)
+                writer.add_scalar('train/_mape', train_mape, epoch)
+                writer.add_scalar('val/_mse', val_mse, epoch)
+                writer.add_scalar('val/_mae', val_mae, epoch)
+                writer.add_scalar('val/_mape', val_mape, epoch)
                 writer.add_scalar('learning_rate', optimizer.param_groups[0]['lr'], epoch)
 
-                _, epoch_test_mae = evaluate_network(model, device, test_loader, epoch)
                 t.set_postfix(time=time.time() - start, lr=optimizer.param_groups[0]['lr'],
                               train_loss=epoch_train_loss, val_loss=epoch_val_loss,
-                              train_MAE=epoch_train_mae.item(), val_MAE=epoch_val_mae.item(),
-                              test_MAE=epoch_test_mae.item(), refresh=False)
+                              train_MSE=train_mse, val_MSE=val_mse, test_MSE=test_mse,
+                              train_MAE=train_mae, val_MAE=val_mae, test_MAE=test_mae,
+                              train_MAPE=train_mape, val_MAPE=val_mape, test_MAPE=test_mape,
+                              refresh=False)
 
                 per_epoch_time.append(time.time() - start)
 
@@ -170,20 +186,40 @@ def train_val_pipeline(dataset, params, net_params, dirs):
         print('-' * 89)
         print('Exiting from training early because of KeyboardInterrupt')
 
-    _, test_mae = evaluate_network(model, device, test_loader, epoch)
-    _, val_mae = evaluate_network(model, device, val_loader, epoch)
-    _, train_mae = evaluate_network(model, device, train_loader, epoch)
+    _, test_error = evaluate_network(model, device, test_loader, epoch)
+    _, val_error = evaluate_network(model, device, val_loader, epoch)
+    _, train_error = evaluate_network(model, device, train_loader, epoch)
+    targets, scores = get_predictions(model, device, train_loader, epoch)
 
+    train_mse, train_mae, train_mape = train_error
+    val_mse, val_mae, val_mape = val_error
+    test_mse, test_mae, test_mape = test_error
+
+    test_mse = test_mse.item()
+    val_mse = val_mse.item()
+    train_mse = train_mse.item()
     test_mae = test_mae.item()
     val_mae = val_mae.item()
     train_mae = train_mae.item()
+    test_mape = test_mape.item()
+    val_mape = val_mape.item()
+    train_mape = train_mape.item()
 
+    max_print = 100
     print(params['features'] + " ---> " + params['label'])
+    print("Train MSE: {:.16f}".format(train_mse))
+    print("Val MSE: {:.16f}".format(val_mse))
+    print("Test MSE: {:.16f}".format(test_mse))
     print("Train MAE: {:.16f}".format(train_mae))
     print("Val MAE: {:.16f}".format(val_mae))
     print("Test MAE: {:.16f}".format(test_mae))
+    print("Train MAPE: {:.16f}".format(train_mape))
+    print("Val MAPE: {:.16f}".format(val_mape))
+    print("Test MAPE: {:.16f}".format(test_mape))
     print("TOTAL TIME TAKEN: {:.4f}s".format(time.time() - t0))
     print("AVG TIME PER EPOCH: {:.4f}s".format(np.mean(per_epoch_time)))
+    print("Targets: ", ", ".join(["%0.3f" % x for x in targets[:max_print]]))
+    print("Scores: ", ", ".join(["%0.3f" % x for x in scores[:max_print]]))
 
     writer.close()
 
@@ -192,11 +228,16 @@ def train_val_pipeline(dataset, params, net_params, dirs):
     """
     with open(write_file_name + '.txt', 'w') as f:
         f.write("""Dataset: {},\nModel: {}\n\nparams={}\n\nnet_params={}\n\n{}\n\nTotal Parameters: {}\n\n
-    FINAL RESULTS\nTEST MAE: {:.4f}\nTRAIN MAE: {:.4f}\n\n
+    FINAL RESULTS\n
+    TEST MSE: {:.4f}\nTRAIN MSE: {:.4f}\n
+    TEST MAE: {:.4f}\nTRAIN MAE: {:.4f}\n
+    TEST MAPE: {:.4f}\nTRAIN MAPE: {:.4f}\n\n
     Total Time Taken: {:.4f} hrs\nAverage Time Per Epoch: {:.4f} s\n\n\n""" \
                 .format(DATASET_NAME, MODEL_NAME, params, net_params, model, net_params['total_param'],
-                        np.mean(np.array(test_mae)), np.array(train_mae), (time.time() - t0) / 3600,
-                        np.mean(per_epoch_time)))
+                        np.mean(np.array(test_mse)), np.array(train_mse),
+                        np.mean(np.array(test_mae)), np.array(train_mae),
+                        np.mean(np.array(test_mape)), np.array(train_mape),
+                        (time.time() - t0) / 3600, np.mean(per_epoch_time)))
 
 
 def main():
