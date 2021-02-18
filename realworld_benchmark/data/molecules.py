@@ -130,6 +130,9 @@ class MoleculeDataset(torch.utils.data.Dataset):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
 
+        # Test with squared distances
+        labels = [x*x for x in labels]
+        
         # Normalization of labels
         if self.normalization:
             labels = [x / self.max_distance for x in labels]
