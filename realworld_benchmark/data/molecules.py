@@ -130,7 +130,7 @@ class MoleculeDataset(torch.utils.data.Dataset):
         # The input samples is a list of pairs (graph, label).
         graphs, labels = map(list, zip(*samples))
 
-        labels = [x*x for x in labels]
+        #labels = [x*x for x in labels]
         
         # Normalization of labels
         if self.normalization:
